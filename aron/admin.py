@@ -40,8 +40,7 @@ class VeximDomainAdmin(admin.ModelAdmin):
     list_display = ('domain', 'enabled', 'avscan', 'spamassassin', 'max_accounts')
     list_filter = ('enabled',)
     exclude = ('uid', 'gid', 'pipe', 'maildir', 'blocklists', 'complexpass')
-    if is_staff:
-        readonly_fields = list_display() + ('max_accounts')
+    list_display = ('max_accounts',)
 
 class VeximUserAdmin(admin.ModelAdmin):
     list_display = ('user', 'domain', 'on_avscan', 'on_spamassassin', 'on_vacation', 'quota', 'enabled')
