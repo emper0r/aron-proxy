@@ -45,7 +45,10 @@ class MACAddressField(models.Field):
         return super(MACAddressField, self).formfield(**defaults)
 
 class Classi(models.Model):
-    group = models.CharField('Nome della Classe', max_length='20', unique=True, help_text='Obbligatorio. Identificativo della Classe')
+    group = models.CharField('Nome della Classe',
+                             max_length='20',
+                             unique=True,
+                             help_text='Obbligatorio. Identificativo della Classe')
     internet = models.BooleanField(default=False)
 
     def __unicode__(self):
@@ -59,9 +62,8 @@ class Classi(models.Model):
         update_squid()
 
 class Professori(models.Model):
-    group = models.ForeignKey(User)
-    professori = models.ManyToManyField(Classi)
-    # group = models.ManyToManyField(Classi)
+    professori = models.ForeignKey(User)
+    group = models.ManyToManyField(Classi)
 
     def __unicode__(self):
         return unicode(self.professori)
@@ -71,7 +73,12 @@ class Professori(models.Model):
 
 class IP(models.Model):
     groups = models.ForeignKey(Classi)
-    ip = models.GenericIPAddressField('Indirizzo IP', unique=True, max_length=15, blank=False, null=False, help_text='Indirizzo IP')
+    ip = models.GenericIPAddressField('Indirizzo IP',
+                                      unique=True,
+                                      max_length=15,
+                                      blank=False,
+                                      null=False,
+                                      help_text='Indirizzo IP')
 
     def __unicode__(self):
         return self.ip
@@ -85,7 +92,9 @@ class IP(models.Model):
 
 class MAC(models.Model):
     groups = models.ForeignKey(Classi)
-    mac = MACAddressField('Indirizzo MAC', blank=False, unique=True,
+    mac = MACAddressField('Indirizzo MAC',
+                          blank=False,
+                          unique=True,
                           help_text='Obbligatorio. Devi inserire la MAC in formato AA:BB:CC:DD:EE:FF')
 
     def __unicode__(self):
@@ -201,18 +210,39 @@ class VeximDomains(models.Model):
         ('local', 'Local'),
         ('relay', 'Relay')
     )
-    domain = models.CharField('Dominio', max_length=128, unique=True, help_text='Dominio virtuale di Posta Elettronica')
+    domain = models.CharField('Dominio',
+                              max_length=128,
+                              unique=True,
+                              help_text='Dominio virtuale di Posta Elettronica')
     enabled = models.BooleanField(default=True)
-    maxmsgsize = models.IntegerField('Massima misura del messagio', default=settings.VEXIM_MAXMSGSIZE, help_text='Misura del messaggio in MegaBytes')
-    max_accounts = models.IntegerField(default=0, help_text='Massimo di account disponibili per questo dominio. '
+    maxmsgsize = models.IntegerField('Massima misura del messagio',
+                                     default=settings.VEXIM_MAXMSGSIZE,
+                                     help_text='Misura del messaggio in MegaBytes')
+    max_accounts = models.IntegerField(default=0,
+                                       help_text='Massimo di account disponibili per questo dominio. '
                                                             'Il zero definici ilimitato.')
-    type = models.CharField('Tipo Dominio', max_length=5, choices=DOMAIN_TYPES, default='local', help_text='Tipo di dominio Local o Relay')
-    avscan = models.BooleanField('Antivirus', default=False, help_text='Abilitare Antivirus')
-    spamassassin = models.BooleanField('Anti SPAM', default=False, help_text='Abilitare Spamassassin')
-    mailinglists = models.BooleanField('Lista distribuzioni', default=False, help_text='Abilitare Lista distribuzioni')
-    sa_tag = models.IntegerField('Score AntiSpam Minimo', default=settings.VEXIM_SA_TAG, help_text='Score minimo per controllo Spamassasin')
-    sa_refuse = models.IntegerField('Score AntiSpam Massimo', default=settings.VEXIM_SA_REFUSE, help_text='Score massimo per controllo Spamassasin')
-    maildir = models.CharField(max_length=128, default=settings.VEXIM_MAILHOME)
+    type = models.CharField('Tipo Dominio',
+                            max_length=5,
+                            choices=DOMAIN_TYPES,
+                            default='local',
+                            help_text='Tipo di dominio Local o Relay')
+    avscan = models.BooleanField('Antivirus',
+                                 default=False,
+                                 help_text='Abilitare Antivirus')
+    spamassassin = models.BooleanField('Anti SPAM',
+                                       default=False,
+                                       help_text='Abilitare Spamassassin')
+    mailinglists = models.BooleanField('Lista distribuzioni',
+                                       default=False,
+                                       help_text='Abilitare Lista distribuzioni')
+    sa_tag = models.IntegerField('Score AntiSpam Minimo',
+                                 default=settings.VEXIM_SA_TAG,
+                                 help_text='Score minimo per controllo Spamassasin')
+    sa_refuse = models.IntegerField('Score AntiSpam Massimo',
+                                    default=settings.VEXIM_SA_REFUSE,
+                                    help_text='Score massimo per controllo Spamassasin')
+    maildir = models.CharField(max_length=128,
+                               default=settings.VEXIM_MAILHOME)
     uid = models.IntegerField(default=settings.VEXIM_UID)
     gid = models.IntegerField(default=settings.VEXIM_GID)
     blocklists = models.BooleanField(default=False)
@@ -246,30 +276,55 @@ class VeximUsers(models.Model):
     user = models.OneToOneField(User)
     domain = models.ForeignKey(VeximDomains)
     passwd = models.CharField(max_length=64)
-    localpart = models.EmailField(max_length=64, help_text='Indirizzo mail del dominio selezzionato')
-    on_avscan = models.BooleanField('Antivirus', default=True, help_text='Abilitare Antivirus')
-    on_spamassassin = models.BooleanField('AntiSPAM', default=True)
-    on_forward = models.BooleanField('Attivazione Inoltro', default=False, help_text='Inoltra mail un\'altro indirizzo')
-    forward = models.EmailField('Indirizzo mail inoltro', max_length=32, blank=True)
-    unseen = models.BooleanField('Posta non visibile', default=False, help_text='Indirizzo mail cego')
-    on_vacation = models.BooleanField('Vacanze', default=False, help_text='Abilitare vacance')
-    vacation = models.TextField('Testo ferie', blank=True, help_text='Scrivi il messaggio delle vacanze')
-    maxmsgsize = models.IntegerField('Massima misura del messaggio.', default=settings.VEXIM_MAXMSGSIZE, help_text='Massima misura del messaggio in bytes')
-    quota = models.IntegerField(default=1073741824, help_text='Massima misura della casella in bytes')
-    sa_tag = models.IntegerField('SPAM Assassin Minimo', default=5, help_text='Score minimo per Spamassassin')
-    sa_refuse = models.IntegerField('SPAM Assassin Massimo', default=10, help_text='Score minimo per Spamassassin')
+    localpart = models.EmailField(max_length=64,
+                                  help_text='Indirizzo mail del dominio selezzionato')
+    on_avscan = models.BooleanField('Antivirus',
+                                    default=True,
+                                    help_text='Abilitare Antivirus')
+    on_spamassassin = models.BooleanField('AntiSPAM',
+                                          default=True)
+    on_forward = models.BooleanField('Attivazione Inoltro',
+                                     default=False,
+                                     help_text='Inoltra mail un\'altro indirizzo')
+    forward = models.EmailField('Indirizzo mail inoltro',
+                                max_length=32,
+                                blank=True)
+    unseen = models.BooleanField('Posta non visibile',
+                                 default=False,
+                                 help_text='Indirizzo mail cego')
+    on_vacation = models.BooleanField('Vacanze',
+                                      default=False,
+                                      help_text='Abilitare vacance')
+    vacation = models.TextField('Testo ferie',
+                                blank=True,
+                                help_text='Scrivi il messaggio delle vacanze')
+    maxmsgsize = models.IntegerField('Massima misura del messaggio.',
+                                     default=settings.VEXIM_MAXMSGSIZE,
+                                     help_text='Massima misura del messaggio in bytes')
+    quota = models.IntegerField(default=1073741824,
+                                help_text='Massima misura della casella in bytes')
+    sa_tag = models.IntegerField('SPAM Assassin Minimo',
+                                 default=5,
+                                 help_text='Score minimo per Spamassassin')
+    sa_refuse = models.IntegerField('SPAM Assassin Massimo',
+                                    default=10,
+                                    help_text='Score minimo per Spamassassin')
     on_blocklist = models.BooleanField(default=False)
     on_complexpass = models.BooleanField(default=False)
     on_piped = models.BooleanField(default=False)
-    username = models.CharField('Login', max_length=64, null=False)
-    enabled = models.BooleanField(default=True, help_text='Utente Abilitato')
+    username = models.CharField('Login',
+                                max_length=64,
+                                null=False)
+    enabled = models.BooleanField(default=True,
+                                  help_text='Utente Abilitato')
     uid = models.IntegerField(default=settings.VEXIM_UID)
     gid = models.IntegerField(default=settings.VEXIM_GID)
     # clear
     # password
     smtp = models.CharField(max_length=64)
     pop = models.CharField(max_length=64)
-    type = models.CharField(max_length=8, default=settings.VEXIM_TYPE)
+    type = models.CharField(max_length=8,
+                            default=settings.VEXIM_TYPE)
 
     def __unicode__(self):
         return unicode(self.user)
@@ -281,16 +336,16 @@ class VeximUsers(models.Model):
 def update_squid():
     proxy_conf = open(settings.SQUID_CONF, 'w')
     squid_conf = 'http_port 127.0.0.1:3128 intercept\n' \
-                 'cache_dir aufs /var/cache/squid 100 16 256\n' \
-                 'coredump_dir /var/cache/squid\n' \
+                 'cache_dir aufs /var/cache/squid3 1024 32 256\n' \
+                 'coredump_dir /var/cache/squid3\n' \
                  'refresh_pattern ^ftp:             1440    20%     10080\n' \
                  'refresh_pattern ^gopher:  1440    0%      1440\n' \
                  'refresh_pattern -i (/cgi-bin/|\?) 0       0%      0\n' \
                  'refresh_pattern .         0       20%     4320\n' \
                  'acl localnet src fc00::/7\n' \
                  'acl localnet src fe80::/10\n' \
-                 'acl classes_internet src "/etc/squid/classes_allow"\n' \
-                 'acl mac_internet arp "/etc/squid/mac_allow"\n' \
+                 'acl classes_internet src "/etc/squid3/classes_allow"\n' \
+                 'acl mac_internet arp "/etc/squid3/mac_allow"\n' \
                  'acl SSL_ports port 443\n' \
                  'acl Safe_ports port 80\n' \
                  'acl Safe_ports port 21\n' \
@@ -314,7 +369,7 @@ def update_squid():
                  'http_access deny all\n' \
                  'visible_hostname firewall' \
                  'forwarded_for off' \
-                 'cache_access_log /var/log/squid/access.log common'
+                 'cache_access_log /var/log/squid3/access.log common'
     file_ip_group_allow = open(settings.SQUID_DIR + 'classes_allow', 'w')
     internet_yes = IP.objects.all().filter(groups=Classi.objects.all().filter(internet=True))
     for i in range(0, internet_yes.count()):

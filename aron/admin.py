@@ -51,7 +51,7 @@ class VeximDomainAdmin(admin.ModelAdmin):
     list_display = ('domain', 'enabled', 'avscan', 'spamassassin', 'max_accounts')
     list_filter = ('enabled',)
     exclude = ('uid', 'gid', 'pipe', 'maildir', 'blocklists', 'complexpass')
-    readonly_fields = ('max_accounts',)
+    # readonly_fields = ('max_accounts',)
 
     def get_readonly_fields(self, request, obj=None):
         if obj is None or obj is not request.user.is_superuser:
@@ -70,11 +70,6 @@ class VeximUserAdmin(admin.ModelAdmin):
         max_accounts = VeximDomains.objects.all()
         accounts = VeximUsers.objects.all()
         if int(max_accounts.values()[0]['max_accounts']) is 0 or int(max_accounts.values()[0]['max_accounts']) > accounts.count():
-            self.localpart = self.user
-            self.username = unicode(self.user) + '@' + unicode(self.domain)
-            self.smtp = settings.VEXIM_MAILHOME + unicode(self.domain) + '/' + unicode(self.user) + '/Maildir/'
-            self.pop = settings.VEXIM_MAILHOME + unicode(self.domain) + '/' + unicode(self.user)
-            self.passwd = User.objects.values().filter(username=self.user)[0]['password']
             super(VeximUserAdmin, self).save_model(request, obj, form, change)
         else:
             messages.error(request, "E' stato riaggiunto il massimo accounts.")
@@ -84,6 +79,6 @@ admin.site.register(Classi, ClassiAdmin)
 admin.site.register(IP, IPAdmin)
 admin.site.register(MAC, MACAdmin)
 admin.site.register(WebContentFilter, WebContentFilterAdmin)
-admin.site.register(Professori, ProfessoriAdmin)
-# admin.site.register(VeximDomains, VeximDomainAdmin)
-# admin.site.register(VeximUsers, VeximUserAdmin)
+# admin.site.register(Professori, ProfessoriAdmin)
+admin.site.register(VeximDomains, VeximDomainAdmin)
+admin.site.register(VeximUsers, VeximUserAdmin)
