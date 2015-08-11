@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 from django.contrib.auth.models import User
+# from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
-from django.forms import fields, ValidationError
 from django.db import models
 from django.conf import settings
+from django import forms
 import re
 import os
 
@@ -20,7 +21,7 @@ mac_re = re.compile(MAC_RE)
 #         defaults.update(kwargs)
 #         return super(IntegerRangeField, self).formfield(**defaults)
 
-class MACAddressFormField(fields.RegexField):
+class MACAddressFormField(forms.fields.RegexField):
     default_error_messages = {
         'invalid': _(u'Enter a valid MAC address.'),
     }
@@ -43,32 +44,47 @@ class MACAddressField(models.Field):
         defaults.update(kwargs)
         return super(MACAddressField, self).formfield(**defaults)
 
-class Classes(models.Model):
-    group = models.CharField('Group', max_length='20', unique=True, help_text='Obbligatorio. Identificativo della Classe' )
+class Classi(models.Model):
+    group = models.CharField('Nome della Classe', max_length='20', unique=True, help_text='Obbligatorio. Identificativo della Classe')
     internet = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.group
 
     class Meta:
-        verbose_name_plural = "Internet - Classes"
+        verbose_name_plural = "Gestione - Classi"
+
+    def save(self, *args, **kwargs):
+        super(Classi, self).save(*args, **kwargs)
+        update_squid()
+
+class Professori(models.Model):
+    group = models.ForeignKey(User)
+    professori = models.ManyToManyField(Classi)
+    # group = models.ManyToManyField(Classi)
+
+    def __unicode__(self):
+        return unicode(self.professori)
+
+    class Meta:
+        verbose_name_plural = "Classi a Docente"
 
 class IP(models.Model):
-    groups = models.ForeignKey(Classes)
+    groups = models.ForeignKey(Classi)
     ip = models.GenericIPAddressField('Indirizzo IP', unique=True, max_length=15, blank=False, null=False, help_text='Indirizzo IP')
 
     def __unicode__(self):
         return self.ip
 
     class Meta:
-        verbose_name_plural = "Internet - IP"
+        verbose_name_plural = "Gestione - IP"
 
     def save(self, *args, **kwargs):
         super(IP, self).save(*args, **kwargs)
         update_squid()
 
 class MAC(models.Model):
-    groups = models.ForeignKey(Classes)
+    groups = models.ForeignKey(Classi)
     mac = MACAddressField('Indirizzo MAC', blank=False, unique=True,
                           help_text='Obbligatorio. Devi inserire la MAC in formato AA:BB:CC:DD:EE:FF')
 
@@ -76,7 +92,7 @@ class MAC(models.Model):
         return self.mac
 
     class Meta:
-        verbose_name_plural = "Internet - MAC"
+        verbose_name_plural = "Gestione - MAC"
 
     def save(self, *args, **kwargs):
         super(MAC, self).save(*args, **kwargs)
@@ -158,7 +174,7 @@ class WebContentFilter(models.Model):
     whitelist = models.BooleanField(default=False, help_text='Contains site specifically 100% suitable for kids')
 
     class Meta:
-        verbose_name_plural = "Internet - Web Content Filter"
+        verbose_name_plural = "Gestione - Web Content Filter"
 
     def save(self, *args, **kwargs):
         super(WebContentFilter, self).save(*args, **kwargs)
@@ -213,7 +229,7 @@ class VeximDomains(models.Model):
         self.maildir = settings.VEXIM_MAILHOME + self.domain
         if not os.path.exists(self.maildir):
             os.makedirs(self.maildir)
-            os.chown(self.maildir, settings.VEXIM_UID, settings.VEXIM_GID)
+            os.chown(self.maildir, 750)
         # self.maxmsgsize = self.maxmsgsize * 1024 * 1024
         super(VeximDomains, self).save(*args, **kwargs)
 
@@ -227,10 +243,10 @@ class VeximUsers(models.Model):
     #     ('fail', 'Blackholed address'),
     #     ('pipe', 'System pipe')
     # )
-    user = models.ForeignKey(User)
+    user = models.OneToOneField(User)
     domain = models.ForeignKey(VeximDomains)
     passwd = models.CharField(max_length=64)
-    localpart = models.EmailField(max_length=64, unique=True, help_text='Indirizzo mail del dominio selezzionato')
+    localpart = models.EmailField(max_length=64, help_text='Indirizzo mail del dominio selezzionato')
     on_avscan = models.BooleanField('Antivirus', default=True, help_text='Abilitare Antivirus')
     on_spamassassin = models.BooleanField('AntiSPAM', default=True)
     on_forward = models.BooleanField('Attivazione Inoltro', default=False, help_text='Inoltra mail un\'altro indirizzo')
@@ -260,20 +276,6 @@ class VeximUsers(models.Model):
 
     class Meta:
         verbose_name_plural = "Posta - Account"
-
-    # Pendiente para Pupo
-    def save(self, *args, **kwargs):
-        max_accounts = VeximDomains.objects.all()
-        accounts = VeximUsers.objects.all()
-        if int(max_accounts.values()[0]['max_accounts']) is 0 or int(max_accounts.values()[0]['max_accounts']) > accounts.count():
-                    self.localpart = self.user
-                    self.username = unicode(self.user) + '@' + unicode(self.domain)
-                    self.smtp = settings.VEXIM_MAILHOME + unicode(self.domain) + '/' + unicode(self.user) + '/Maildir/'
-                    self.pop = settings.VEXIM_MAILHOME + unicode(self.domain) + '/' + unicode(self.user)
-                    self.passwd = User.objects.values().filter(username=self.user)[0]['password']
-                    super(VeximUsers, self).save(*args, **kwargs)
-        else:
-            raise ValidationError('E\' stato riaggiunto il numero massimo accounts')
 
 
 def update_squid():
@@ -314,15 +316,32 @@ def update_squid():
                  'forwarded_for off' \
                  'cache_access_log /var/log/squid/access.log common'
     file_ip_group_allow = open(settings.SQUID_DIR + 'classes_allow', 'w')
-    internet_yes = IP.objects.all().filter(groups=Classes.objects.all().filter(internet=True))
+    internet_yes = IP.objects.all().filter(groups=Classi.objects.all().filter(internet=True))
     for i in range(0, internet_yes.count()):
         file_ip_group_allow.write(str(internet_yes[i])+'\n')
     file_ip_group_allow.close()
     file_mac_group_allow = open(settings.SQUID_DIR + 'mac_allow', 'w')
-    internet_yes = MAC.objects.all().filter(groups=Classes.objects.all().filter(internet=True))
+    internet_yes = MAC.objects.all().filter(groups=Classi.objects.all().filter(internet=True))
     for i in range(0, internet_yes.count()):
         file_mac_group_allow.write(str(internet_yes[i])+'\n')
     file_mac_group_allow.close()
     proxy_conf.write(squid_conf)
     proxy_conf.close()
     os.system("squid -k parse && squid -k reconfigure")
+
+
+
+# class NetworkNode(models.Model):
+#     mac = MACAddressField('Indirizzo MAC', blank=False, unique=True,
+#                           help_text='Obbligatorio. Devi inserire la MAC in formato AA:BB:CC:DD:EE:FF')
+#     ip = models.GenericIPAddressField(help_text=_('Indirizzo IP'), unique=True, blank=False)
+#     hostname = models.CharField('Nome dell PC', unique=True, blank=False, max_length=64)
+#     created = models.DateTimeField(auto_now_add=True)
+#     last_modified = models.DateTimeField(auto_now=True)
+#     is_valid = models.BooleanField(default=False)
+#
+#     def __str__(self):
+#         return "%s %s %s" % (self.mac_address, self.ip, self.hostname)
+#
+#     def get_absolute_url(self):
+#         return reverse('detail', kwargs={'pk': self.pk})

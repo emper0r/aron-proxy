@@ -14,14 +14,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Classes',
+            name='Classi',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('group', models.CharField(help_text='Obbligatorio. Identificativo della Classe', max_length='20', verbose_name='Group')),
+                ('group', models.CharField(help_text='Obbligatorio. Identificativo della Classe', unique=True, max_length='20', verbose_name='Group')),
                 ('internet', models.BooleanField(default=False)),
             ],
             options={
-                'verbose_name_plural': 'Internet - Classes',
+                'verbose_name_plural': 'Gestione - Classi',
             },
         ),
         migrations.CreateModel(
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('ip', models.GenericIPAddressField(help_text='Indirizzo IP', unique=True, verbose_name='Indirizzo IP')),
-                ('groups', models.ForeignKey(to='aron.Classes')),
+                ('groups', models.ForeignKey(to='aron.Classi')),
             ],
             options={
                 'verbose_name_plural': 'Internet - IP',
@@ -39,8 +39,8 @@ class Migration(migrations.Migration):
             name='MAC',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('mac', aron.models.MACAddressField(help_text='Obbligatorio. Devi inserire la MAC in formato AA:BB:CC:DD:EE:FF', max_length=17, verbose_name='Indirizzo MAC')),
-                ('groups', models.ForeignKey(to='aron.Classes')),
+                ('mac', aron.models.MACAddressField(help_text='Obbligatorio. Devi inserire la MAC in formato AA:BB:CC:DD:EE:FF', unique=True, max_length=17, verbose_name='Indirizzo MAC')),
+                ('groups', models.ForeignKey(to='aron.Classi')),
             ],
             options={
                 'verbose_name_plural': 'Internet - MAC',
@@ -56,10 +56,10 @@ class Migration(migrations.Migration):
                 ('max_accounts', models.IntegerField(default=0, help_text='Massimo di account disponibili per questo dominio. Il zero definici ilimitato.')),
                 ('type', models.CharField(default='local', help_text='Tipo di dominio Local o Relay', max_length=5, verbose_name='Tipo Dominio', choices=[('local', 'Local'), ('relay', 'Relay')])),
                 ('avscan', models.BooleanField(default=False, help_text='Abilitare Antivirus', verbose_name='Antivirus')),
-                ('spamassassin', models.BooleanField(default=False, help_text='Abilitare Spamassassin', verbose_name='SPAM Assassin')),
+                ('spamassassin', models.BooleanField(default=False, help_text='Abilitare Spamassassin', verbose_name='Anti SPAM')),
                 ('mailinglists', models.BooleanField(default=False, help_text='Abilitare Lista distribuzioni', verbose_name='Lista distribuzioni')),
-                ('sa_tag', models.IntegerField(default=5, help_text='Score minimo per controllo Spamassasin', verbose_name='SPAM Assassin TAG')),
-                ('sa_refuse', models.IntegerField(default=10, help_text='Score massimo per controllo Spamassasin', verbose_name='SPAM Assassin Refiuto')),
+                ('sa_tag', models.IntegerField(default=5, help_text='Score minimo per controllo Spamassasin', verbose_name='Score AntiSpam Minimo')),
+                ('sa_refuse', models.IntegerField(default=10, help_text='Score massimo per controllo Spamassasin', verbose_name='Score AntiSpam Massimo')),
                 ('maildir', models.CharField(default=b'/srv/vmail/', max_length=128)),
                 ('uid', models.IntegerField(default=999)),
                 ('gid', models.IntegerField(default=999)),
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 ('passwd', models.CharField(max_length=64)),
                 ('localpart', models.EmailField(help_text='Indirizzo mail del dominio selezzionato', max_length=64)),
                 ('on_avscan', models.BooleanField(default=True, help_text='Abilitare Antivirus', verbose_name='Antivirus')),
-                ('on_spamassassin', models.BooleanField(default=True, verbose_name='SPAM Assassin')),
+                ('on_spamassassin', models.BooleanField(default=True, verbose_name='AntiSPAM')),
                 ('on_forward', models.BooleanField(default=False, help_text="Inoltra mail un'altro indirizzo", verbose_name='Attivazione Inoltro')),
                 ('forward', models.EmailField(max_length=32, verbose_name='Indirizzo mail inoltro', blank=True)),
                 ('unseen', models.BooleanField(default=False, help_text='Indirizzo mail cego', verbose_name='Posta non visibile')),
@@ -99,7 +99,7 @@ class Migration(migrations.Migration):
                 ('pop', models.CharField(max_length=64)),
                 ('type', models.CharField(default=b'local', max_length=8)),
                 ('domain', models.ForeignKey(to='aron.VeximDomains')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name_plural': 'Posta - Account',
