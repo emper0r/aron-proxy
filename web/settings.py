@@ -23,6 +23,7 @@ SQUID_DIR = '/etc/squid3/'
 SQUID_CONF = '/etc/squid3/squid.conf'
 DG_DOMAIN = '/etc/dansguardian/lists/bannedsitelist'
 DG_URL = '/etc/dansguardian/lists/bannedurllist'
+NETWORK_CONF = '/etc/network/interfaces'
 DEFAULT_FROM_EMAIL = 'no-reply@aron.ctimeapps.it'
 
 INSTALLED_APPS = (
@@ -33,7 +34,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'aron',
+    'Internet',
+    'Posta',
+    'Network',
 )
 
 MIDDLEWARE_CLASSES = (
