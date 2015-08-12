@@ -5,20 +5,9 @@ from django import forms
 from django.conf import settings
 import re
 import os
-import socket, struct, fcntl
 
 MAC_RE = r'^([0-9a-fA-F]{2}([:]|$)){6}$'
 mac_re = re.compile(MAC_RE)
-
-# class IntegerRangeField(models.IntegerField):
-#     def __init__(self, verbose_name=None, name=None, min_value=None, max_value=None, **kwargs):
-#         self.min_value, self.max_value = min_value, max_value
-#         models.IntegerField.__init__(self, verbose_name, name, **kwargs)
-#
-#     def formfield(self, **kwargs):
-#         defaults = {'min_value': self.min_value, 'max_value':self.max_value}
-#         defaults.update(kwargs)
-#         return super(IntegerRangeField, self).formfield(**defaults)
 
 class MACAddressFormField(forms.fields.RegexField):
     default_error_messages = {
@@ -95,7 +84,7 @@ class IP(models.Model):
                             help_text='Seleziona maschera rete lato LAN')
 
     def __unicode__(self):
-        return unicode(self.ip_wan)
+        return 'Network'
 
     class Meta:
         verbose_name_plural = "Gestione - IP"
@@ -131,4 +120,3 @@ class MAC(models.Model):
 
     def save(self, *args, **kwargs):
         super(MAC, self).save(*args, **kwargs)
-        update_squid()

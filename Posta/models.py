@@ -126,7 +126,7 @@ class VeximUsers(models.Model):
                             default=settings.VEXIM_TYPE)
 
     def __unicode__(self):
-        return unicode(self.user)
+        return unicode(' ')
 
     class Meta:
         verbose_name_plural = "Posta - Account"
