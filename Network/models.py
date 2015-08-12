@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django import forms
+from django.conf import settings
 import re
 import os
 import socket, struct, fcntl
@@ -44,12 +45,12 @@ class MACAddressField(models.Field):
 
 class IP(models.Model):
     netmasks = (
-        ('/30', '255.255.255.252'),
-        ('/29', '255.255.255.248'),
-        ('/28', '255.255.255.240'),
-        ('/24', '255.255.255.0'),
-        ('/16', '255.255.0.0'),
-        ('/8', '255.0.0.0'),
+        ('255.255.255.252', '255.255.255.252'),
+        ('255.255.255.248', '255.255.255.248'),
+        ('255.255.255.240', '255.255.255.240'),
+        ('255.255.255.0', '255.255.255.0'),
+        ('255.255.0.0', '255.255.0.0'),
+        ('255.0.0.0', '255.0.0.0'),
     )
     ip_wan = models.GenericIPAddressField('WAN',
                                       unique=True,
@@ -94,7 +95,7 @@ class IP(models.Model):
                             help_text='Seleziona maschera rete lato LAN')
 
     def __unicode__(self):
-        return self.ip
+        return unicode(self.ip_wan)
 
     class Meta:
         verbose_name_plural = "Gestione - IP"
@@ -104,13 +105,13 @@ class IP(models.Model):
         parameters = 'auto lo eth0 eth1\n' \
                      'iface lo inet loopback\n' \
                      'iface eth0 inet static\n' \
-                     '\taddress' + self.ip_wan + '\n' \
-                     '\tnetwork' + self.mask_wan + '\n' \
-                     '\tgateway' + self.gateway + '\n\n' \
+                     '\taddress ' + self.ip_wan + '\n' \
+                     '\tnetwork ' + self.mask_wan + '\n' \
+                     '\tgateway ' + self.gateway + '\n\n' \
                      'iface eth1 inet static\n' \
-                     '\taddress' + self.ip_lan + '\n' \
-                     '\tnetwork' + self.mask_lan + '\n' \
-                     '\tdns-servers' + self.dns1 + ' ' + self.dns2 + '\n'
+                     '\taddress ' + self.ip_lan + '\n' \
+                     '\tnetwork ' + self.mask_lan + '\n' \
+                     '\tdns-servers ' + self.dns1 + ' ' + self.dns2 + '\n'
         network_conf.write(str(parameters))
         network_conf.close()
         os.system("/etc/network/interfaces restart")
