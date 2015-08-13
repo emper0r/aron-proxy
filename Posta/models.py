@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
+from sizefield.models import FileSizeField
 import os
 
 
@@ -15,7 +16,7 @@ class VeximDomains(models.Model):
                               unique=True,
                               help_text='Dominio virtuale di Posta Elettronica')
     enabled = models.BooleanField(default=True)
-    maxmsgsize = models.IntegerField('Massima misura del messagio',
+    maxmsgsize = FileSizeField('Massima misura del messagio',
                                      default=settings.VEXIM_MAXMSGSIZE,
                                      help_text='Misura del messaggio in MegaBytes')
     max_accounts = models.IntegerField(default=0,
@@ -53,14 +54,13 @@ class VeximDomains(models.Model):
         return self.domain
 
     class Meta:
-        verbose_name_plural = "Posta - Dominio"
+        verbose_name = "Posta - Dominio"
 
     def save(self, *args, **kwargs):
         self.maildir = settings.VEXIM_MAILHOME + self.domain
         if not os.path.exists(self.maildir):
             os.makedirs(self.maildir)
             os.chown(self.maildir, 750)
-        # self.maxmsgsize = self.maxmsgsize * 1024 * 1024
         super(VeximDomains, self).save(*args, **kwargs)
 
 class VeximUsers(models.Model):
@@ -97,10 +97,10 @@ class VeximUsers(models.Model):
     vacation = models.TextField('Testo ferie',
                                 blank=True,
                                 help_text='Scrivi il messaggio delle vacanze')
-    maxmsgsize = models.IntegerField('Massima misura del messaggio.',
-                                     default=settings.VEXIM_MAXMSGSIZE,
+    maxmsgsize = FileSizeField('Massima misura del messaggio.',
+                                      default=settings.VEXIM_MAXMSGSIZE,
                                      help_text='Massima misura del messaggio in bytes')
-    quota = models.IntegerField(default=1073741824,
+    quota = FileSizeField(default=settings.VEXIM_QUOTA,
                                 help_text='Massima misura della casella in bytes')
     sa_tag = models.IntegerField('SPAM Assassin Minimo',
                                  default=5,
@@ -129,4 +129,4 @@ class VeximUsers(models.Model):
         return unicode(' ')
 
     class Meta:
-        verbose_name_plural = "Posta - Account"
+        verbose_name = "Posta - Account"
