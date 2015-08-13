@@ -11,6 +11,11 @@ class ClassiAdmin(admin.ModelAdmin):
     list_display = ('group', 'internet')
     list_filter = ('internet',)
 
+    def get_queryset(self, request):
+        qs = super(ClassiAdmin, self).get_queryset(request)
+        if request.user.is_staff and request.user.is_superuser:
+            return qs
+        return qs.filter(professori__professori=request.user)
 
 class ProfessoriAdmin(admin.ModelAdmin):
     list_display = ('professori',)

@@ -1,12 +1,13 @@
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
+SITE_ID = 1
 SECRET_KEY = 'xz)*53&2z7w_-g_eajchp8p&*m1!9c*synd!^p-z4v9qdb*g%!'
 DEBUG = True
 TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = ['localhost']
 ROOT_URLCONF = 'web.urls'
 WSGI_APPLICATION = 'web.wsgi.application'
-STATIC_URL = '/home/tony/Documents/developer/pyqt/aron/aron-web/aron/static/'
+STATIC_URL = '/usr/local/src/aron-web/aron/static/'
 LANGUAGE_CODE = 'it-it'
 TIME_ZONE = 'Europe/Rome'
 USE_I18N = True
@@ -28,6 +29,9 @@ DEFAULT_FROM_EMAIL = 'no-reply@aron.ctimeapps.it'
 
 INSTALLED_APPS = (
     'suit',
+    # 'material',
+    # 'material.frontend',
+    # 'material.admin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -67,4 +71,6 @@ PASSWORD_HASHERS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = TCP + (
     'django.core.context_processors.request',
+    'material.frontend.context_processors.modules',
 )
+

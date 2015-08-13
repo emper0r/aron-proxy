@@ -2,6 +2,7 @@ from django.contrib import admin
 from singlemodeladmin import SingleModelAdmin
 from Network.models import IP
 
+
 class IPAdmin(SingleModelAdmin):
      fieldsets = (
         ('Internet', {

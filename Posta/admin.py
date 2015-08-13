@@ -8,13 +8,12 @@ class VeximDomainAdmin(admin.ModelAdmin):
     list_display = ('domain', 'enabled', 'avscan', 'spamassassin', 'max_accounts')
     list_filter = ('enabled',)
     exclude = ('uid', 'gid', 'pipe', 'maildir', 'blocklists', 'complexpass')
-    # readonly_fields = ('max_accounts',)
 
     def get_readonly_fields(self, request, obj=None):
-        if obj is None or obj is not request.user.is_superuser:
-            return self.readonly_fields
+        if not request.user.is_superuser:
+            return ['max_accounts']
         else:
-            return self.model._meta.get_all_field_names()
+            return []
 
 
 class VeximUserAdmin(admin.ModelAdmin):
@@ -29,6 +28,7 @@ class VeximUserAdmin(admin.ModelAdmin):
         if int(max_accounts.values()[0]['max_accounts']) is 0 or int(max_accounts.values()[0]['max_accounts']) > accounts.count():
             super(VeximUserAdmin, self).save_model(request, obj, form, change)
         else:
+            messages.set_level(request, messages.ERROR)
             messages.error(request, "E' stato riaggiunto il massimo accounts.")
 
 
