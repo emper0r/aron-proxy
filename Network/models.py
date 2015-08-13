@@ -87,7 +87,7 @@ class IP(models.Model):
         return 'Network'
 
     class Meta:
-        verbose_name_plural = "Gestione - IP"
+        verbose_name_plural = "Impostazioni"
 
     def save(self, *args, **kwargs):
         network_conf = open(settings.NETWORK_CONF, 'w')
@@ -116,7 +116,7 @@ class MAC(models.Model):
         return self.mac
 
     class Meta:
-        verbose_name_plural = "Gestione - MAC"
+        verbose_name = "MAC"
 
     def save(self, *args, **kwargs):
         super(MAC, self).save(*args, **kwargs)

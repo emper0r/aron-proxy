@@ -182,7 +182,10 @@ class WebContentFilter(models.Model):
     whitelist = models.BooleanField(default=False, help_text='Contains site specifically 100% suitable for kids')
 
     class Meta:
-        verbose_name_plural = "Gestione - Web Content Filter"
+        verbose_name_plural = "Web Content Filter"
+
+    def __unicode__(self):
+        return 'Categories'
 
     def save(self, *args, **kwargs):
         super(WebContentFilter, self).save(*args, **kwargs)

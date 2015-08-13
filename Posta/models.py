@@ -54,7 +54,7 @@ class VeximDomains(models.Model):
         return self.domain
 
     class Meta:
-        verbose_name = "Posta - Dominio"
+        verbose_name = "Dominio"
 
     def save(self, *args, **kwargs):
         self.maildir = settings.VEXIM_MAILHOME + self.domain
@@ -129,4 +129,4 @@ class VeximUsers(models.Model):
         return unicode(' ')
 
     class Meta:
-        verbose_name = "Posta - Account"
+        verbose_name = "Account"
