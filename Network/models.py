@@ -83,6 +83,10 @@ class IP(models.Model):
                             unique=True,
                             help_text='Seleziona maschera rete lato LAN')
 
+    dhcp = models.BooleanField('DHCP abilitato', default=True)
+    ip_start = models.GenericIPAddressField('Indirizzo IP inizio', max_length=15)
+    ip_end = models.GenericIPAddressField('Indirizzo IP finale', max_length=15)
+
     def __unicode__(self):
         return 'Network'
 
