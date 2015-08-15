@@ -2,9 +2,7 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django import forms
-from django.conf import settings
 import re
-import os
 
 MAC_RE = r'^([0-9a-fA-F]{2}([:]|$)){6}$'
 mac_re = re.compile(MAC_RE)
@@ -42,34 +40,34 @@ class IP(models.Model):
         ('255.0.0.0', '255.0.0.0'),
     )
     ip_wan = models.GenericIPAddressField('WAN',
-                                      unique=True,
-                                      max_length=15,
-                                      blank=False,
-                                      null=False,
-                                      help_text='Indirizzo IP lato Internet')
+                                          unique=True,
+                                          max_length=15,
+                                          blank=False,
+                                          null=False,
+                                          help_text='Indirizzo IP lato Internet')
     mask_wan = models.CharField('Netmask',
-                            max_length=17,
-                            choices=netmasks,
-                            null=False,
-                            unique=True,
-                            help_text='Seleziona maschera rete WAN')
+                                max_length=17,
+                                choices=netmasks,
+                                null=False,
+                                unique=True,
+                                help_text='Seleziona maschera rete WAN')
     gateway = models.GenericIPAddressField('Gateway',
-                                      unique=True,
-                                      max_length=15,
-                                      blank=False,
-                                      null=False,
-                                      help_text='Porta Gateway di uscita a Internet')
+                                           unique=True,
+                                           max_length=15,
+                                           blank=False,
+                                           null=False,
+                                           help_text='Porta Gateway di uscita a Internet')
     dns1 = models.GenericIPAddressField('DNS 1:',
-                                      unique=True,
-                                      max_length=15,
-                                      blank=False,
-                                      null=False,
-                                      help_text='DNS primario')
+                                        unique=True,
+                                        max_length=15,
+                                        blank=False,
+                                        null=False,
+                                        help_text='DNS primario')
     dns2 = models.GenericIPAddressField('DNS 2:',
-                                      unique=True,
-                                      max_length=15,
-                                      blank=False,
-                                      help_text='DNS secondario')
+                                        unique=True,
+                                        max_length=15,
+                                        blank=False,
+                                        help_text='DNS secondario')
     ip_lan = models.GenericIPAddressField('LAN',
                                       unique=True,
                                       max_length=15,
@@ -77,11 +75,11 @@ class IP(models.Model):
                                       null=False,
                                       help_text='Indirizzo IP della rete Interna')
     mask_lan = models.CharField('Netmask',
-                            max_length=17,
-                            choices=netmasks,
-                            null=False,
-                            unique=True,
-                            help_text='Seleziona maschera rete lato LAN')
+                                max_length=17,
+                                choices=netmasks,
+                                null=False,
+                                unique=True,
+                                help_text='Seleziona maschera rete lato LAN')
 
     dhcp = models.BooleanField('DHCP abilitato', default=True)
     ip_start = models.GenericIPAddressField('Indirizzo IP inizio', max_length=15)
