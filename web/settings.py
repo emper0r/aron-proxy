@@ -1,6 +1,15 @@
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
+import os
 
-SITE_ID = 1
+# IDX = os.system("ID=$(ls -lh /dev/disk/by-uuid/ | "
+#                 "egrep 'dm-1' | "
+#                 "awk '{print $9}') | "
+#                 "xargs ava-key generate "
+#                 "-s eeef3917-6a27-4208-af1f-2bf864cb53f8 "
+#                 "-p eeef3917-6a27-4208-af1f-2bf864cb53f8 | "
+#                 "egrep xid | "
+#                 "awk '{print $2}'")
+# print IDX
 SECRET_KEY = 'xz)*53&2z7w_-g_eajchp8p&*m1!9c*synd!^p-z4v9qdb*g%!'
 DEBUG = True
 TEMPLATE_DEBUG = True
@@ -26,6 +35,7 @@ SQUID_CONF = '/etc/squid3/squid.conf'
 DG_DOMAIN = '/etc/dansguardian/lists/bannedsitelist'
 DG_URL = '/etc/dansguardian/lists/bannedurllist'
 NETWORK_CONF = '/etc/network/interfaces'
+DHCP_CONF = '/etc/dhcp/dhcpd.conf'
 DEFAULT_FROM_EMAIL = 'no-reply@aron.ctimeapps.it'
 
 INSTALLED_APPS = (

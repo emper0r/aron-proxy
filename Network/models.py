@@ -93,22 +93,6 @@ class IP(models.Model):
     class Meta:
         verbose_name_plural = "Impostazioni"
 
-    def save(self, *args, **kwargs):
-        network_conf = open(settings.NETWORK_CONF, 'w')
-        parameters = 'auto lo eth0 eth1\n' \
-                     'iface lo inet loopback\n' \
-                     'iface eth0 inet static\n' \
-                     '\taddress ' + self.ip_wan + '\n' \
-                     '\tnetwork ' + self.mask_wan + '\n' \
-                     '\tgateway ' + self.gateway + '\n\n' \
-                     'iface eth1 inet static\n' \
-                     '\taddress ' + self.ip_lan + '\n' \
-                     '\tnetwork ' + self.mask_lan + '\n' \
-                     '\tdns-servers ' + self.dns1 + ' ' + self.dns2 + '\n'
-        network_conf.write(str(parameters))
-        network_conf.close()
-        os.system("/etc/network/interfaces restart")
-        super(IP, self).save(*args, **kwargs)
 
 class MAC(models.Model):
     mac = MACAddressField('Indirizzo MAC',
