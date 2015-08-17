@@ -4,14 +4,15 @@ import os
 SECRET_KEY = 'xz)*53&2z7w_-g_eajchp8p&*m1!9c*synd!^p-z4v9qdb*g%!'
 DEBUG = False
 TEMPLATE_DEBUG = True
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['aron.ctimeapps.it']
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 ROOT_URLCONF = 'web.urls'
 WSGI_APPLICATION = 'web.wsgi.application'
-STATICFILES_DIRS = (
-  os.path.join(SITE_ROOT, 'static/'),
-)
+#STATICFILES_DIRS = (
+#  os.path.join(SITE_ROOT, 'static/'),
+#)
 STATIC_URL = '/static/'
+STATIC_ROOT = SITE_ROOT + STATIC_URL
 LANGUAGE_CODE = 'it-it'
 TIME_ZONE = 'Europe/Rome'
 USE_I18N = True

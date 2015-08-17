@@ -115,9 +115,26 @@ class License(models.Model):
                 ('VT', 'Viterbo'))
     client = models.CharField('Nome cliente', max_length=64, help_text="Nominativo cliente")
     province = models.CharField('Provincia', max_length=16, choices=PROVINCE, help_text="Seleziona la provincia")
-    req = models.CharField('Licenza A', max_length=64, help_text="Inserice il codice licenza")
-    lic = models.CharField('Licenza B', max_length=64, help_text="Inserice il codice licenza")
+    lic_a = models.CharField('Licenza A', max_length=64, help_text="Inserice il codice licenza")
+    lic_b = models.CharField('Licenza B', max_length=64, help_text="Inserice il codice licenza")
     exp_lic = models.DateField('Scandenza licenza', auto_now=True, default=datetime.date.today)
 
     def __str__(self):
         return self.client
+
+    def masq_A(self):
+        lic_items = License.objects.all()
+        lic_a = lic_items.values()[0]['lic_a']
+        return str(lic_a).replace(lic_a, '*' * len(lic_a))
+
+    masq_A.short_description = 'Licenza A'
+
+    def masq_B(self):
+        lic_items = License.objects.all()
+        lic_b = lic_items.values()[0]['lic_b']
+        return str(lic_b).replace(lic_b, '*' * len(lic_b))
+
+    masq_B.short_description = 'Licenza B'
+
+    lic_masq_a = property(masq_A)
+    lic_masq_b = property(masq_B)

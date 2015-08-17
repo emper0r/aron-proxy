@@ -17,6 +17,7 @@ from Network.models import IPNetwork
 from Network.admin import IPNetworkAdmin
 import os
 import key
+import time
 
 admin.site.unregister(User)
 admin.site.unregister(Group)
@@ -24,28 +25,29 @@ admin.site.unregister(Group)
 class LicAdmin(SingleModelAdmin):
     k = License.objects.all().count()
     if k > 0:
-        readonly_fields = ('client', 'province', 'lic', 'req', 'exp_lic')
+        readonly_fields = ('client', 'province', 'masq_A', 'masq_B', 'exp_lic')
+        exclude = ('lic_a', 'lic_b')
     else:
-        list_display = ('lic', 'req')
+        list_display = ('lic_a', 'lic_b')
         exclude = ('exp_lic',)
 
     def save_model(self, request, obj, form, change):
         k = License.objects.all().count()
         if k is 0:
-            lic = form.cleaned_data['lic']
-            req = form.cleaned_data['req']
-            check_lic = key.validate(req, lic)
+            lic_a = form.cleaned_data['lic_a']
+            lic_b = form.cleaned_data['lic_b']
+            check_lic = key.validate(lic_a, lic_b)
             if check_lic is 0:
                 super(LicAdmin, self).save_model(request, obj, form, change)
                 messages.set_level(request, messages.SUCCESS)
-                messages.error(request, "Devi uscire ed entrare nel sistema di nuovo.")
-                os.system("/etc/init.d/apache2 restart")
+                time.sleep(4)
+                os.system('/etc/init.d/apache2 restart')
             else:
                 messages.set_level(request, messages.ERROR)
-                messages.error(request, "Licenza invalida, chiede assistenza a Computer Time s.r.l")
+                messages.error(request, "Licenza sbagliata, chiede assistenza a Computer Time s.r.l")
         else:
             messages.set_level(request, messages.ERROR)
-            messages.error(request, "Licenza e gia' attivata.")
+            messages.error(request, "Licenza e gia' attiva.")
 
 admin.site.register(License, LicAdmin)
 if License.objects.all().count() > 0:
