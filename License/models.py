@@ -110,7 +110,7 @@ class License(models.Model):
                 ('VB', 'Verbano-Cusio-Ossola'),
                 ('VC', 'Vercelli'),
                 ('VR', 'Verona'),
-                ('50', 'Vibo'),
+                ('VV', 'Vibo Valentina'),
                 ('VI', 'Vicenza'),
                 ('VT', 'Viterbo'))
     client = models.CharField('Nome cliente', max_length=64, help_text="Nominativo cliente")
