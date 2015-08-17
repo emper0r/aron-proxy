@@ -7,7 +7,7 @@ import key
 class LicAdmin(SingleModelAdmin):
     k = License.objects.all().count()
     if k > 0:
-        readonly_fields = ('lic', 'req', 'exp_lic')
+        readonly_fields = ('client', 'province', 'lic', 'req', 'exp_lic')
     else:
         list_display = ('lic', 'req')
         exclude = ('exp_lic',)
@@ -20,7 +20,7 @@ class LicAdmin(SingleModelAdmin):
             check_lic = key.validate(req, lic)
             if check_lic is 0:
                 super(LicAdmin, self).save_model(request, obj, form, change)
-                messages.set_level(request, messages.SUCCESS)
+                messages.set_level(request, messages.INFO)
                 messages.error(request, "Licenza valida, attivazione eseguita con esito!")
 
             else:
