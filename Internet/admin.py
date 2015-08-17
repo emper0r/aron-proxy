@@ -5,6 +5,8 @@ from Internet.models import IP
 from Internet.models import MAC
 from Internet.models import WebContentFilter
 from Internet.models import Professori
+from Internet.models import NewDevices
+from License.models import License
 
 
 class ClassiAdmin(admin.ModelAdmin):
@@ -49,8 +51,14 @@ class WebContentFilterAdmin(SingleModelAdmin):
                     'weather', 'weapons', 'webmail', 'whitelist')
 
 
-admin.site.register(Classi, ClassiAdmin)
-admin.site.register(IP, IPAdmin)
-admin.site.register(MAC, MACAdmin)
-admin.site.register(WebContentFilter, WebContentFilterAdmin)
-admin.site.register(Professori, ProfessoriAdmin)
+class NewDevicesAdmin(admin.ModelAdmin):
+    pass
+
+k = License.objects.all().count()
+if k > 0:
+    admin.site.register(Classi, ClassiAdmin)
+    admin.site.register(IP, IPAdmin)
+    admin.site.register(MAC, MACAdmin)
+    admin.site.register(WebContentFilter, WebContentFilterAdmin)
+    admin.site.register(Professori, ProfessoriAdmin)
+    admin.site.register(NewDevices, NewDevicesAdmin)

@@ -256,21 +256,15 @@ def update_squid():
     file_mac_group_allow.close()
     proxy_conf.write(squid_conf)
     proxy_conf.close()
-    os.system("squid -k parse && squid -k reconfigure")
+    os.system("squid3 -k parse && squid3 -k reconfigure")
 
 
+class NewDevices(models.Model):
+    classi = models.ForeignKey(Classi)
+    devices = models.ManyToManyField(MAC)
 
-# class NetworkNode(models.Model):
-#     mac = MACAddressField('Indirizzo MAC', blank=False, unique=True,
-#                           help_text='Obbligatorio. Devi inserire la MAC in formato AA:BB:CC:DD:EE:FF')
-#     ip = models.GenericIPAddressField(help_text=_('Indirizzo IP'), unique=True, blank=False)
-#     hostname = models.CharField('Nome dell PC', unique=True, blank=False, max_length=64)
-#     created = models.DateTimeField(auto_now_add=True)
-#     last_modified = models.DateTimeField(auto_now=True)
-#     is_valid = models.BooleanField(default=False)
-#
-#     def __str__(self):
-#         return "%s %s %s" % (self.mac_address, self.ip, self.hostname)
-#
-#     def get_absolute_url(self):
-#         return reverse('detail', kwargs={'pk': self.pk})
+    def __unicode__(self):
+        return unicode(self.classi)
+
+    class Meta:
+        verbose_name_plural = "Dispositivi nuovi"

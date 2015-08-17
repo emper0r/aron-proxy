@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib import messages
 from django.conf import settings
 from singlemodeladmin import SingleModelAdmin
+from License.models import License
 from Network.models import IP
 import os
 import iptools
@@ -78,5 +79,6 @@ class IPAdmin(SingleModelAdmin):
         else:
             os.system('/etc/init.d/isc-dhcp-server stop')
 
-
-admin.site.register(IP, IPAdmin)
+k = License.objects.all().count()
+if k > 0:
+    admin.site.register(IP, IPAdmin)

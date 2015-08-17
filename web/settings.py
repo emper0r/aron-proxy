@@ -1,15 +1,6 @@
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 import os
 
-# IDX = os.system("ID=$(ls -lh /dev/disk/by-uuid/ | "
-#                 "egrep 'dm-1' | "
-#                 "awk '{print $9}') | "
-#                 "xargs ava-key generate "
-#                 "-s eeef3917-6a27-4208-af1f-2bf864cb53f8 "
-#                 "-p eeef3917-6a27-4208-af1f-2bf864cb53f8 | "
-#                 "egrep xid | "
-#                 "awk '{print $2}'")
-# print IDX
 SECRET_KEY = 'xz)*53&2z7w_-g_eajchp8p&*m1!9c*synd!^p-z4v9qdb*g%!'
 DEBUG = True
 TEMPLATE_DEBUG = True
@@ -52,6 +43,7 @@ INSTALLED_APPS = (
     'Internet',
     'Posta',
     'Network',
+    'License',
 )
 
 MIDDLEWARE_CLASSES = (
