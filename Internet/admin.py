@@ -1,13 +1,5 @@
 from django.contrib import admin
 from singlemodeladmin import SingleModelAdmin
-from Internet.models import Classi
-from Internet.models import IP
-from Internet.models import MAC
-from Internet.models import WebContentFilter
-from Internet.models import Professori
-from Internet.models import NewDevices
-from License.models import License
-
 
 class ClassiAdmin(admin.ModelAdmin):
     list_display = ('group', 'internet')
@@ -54,11 +46,3 @@ class WebContentFilterAdmin(SingleModelAdmin):
 class NewDevicesAdmin(admin.ModelAdmin):
     pass
 
-k = License.objects.all().count()
-if k > 0:
-    admin.site.register(Classi, ClassiAdmin)
-    admin.site.register(IP, IPAdmin)
-    admin.site.register(MAC, MACAdmin)
-    admin.site.register(WebContentFilter, WebContentFilterAdmin)
-    admin.site.register(Professori, ProfessoriAdmin)
-    admin.site.register(NewDevices, NewDevicesAdmin)

@@ -30,7 +30,7 @@ class MACAddressField(models.Field):
         defaults.update(kwargs)
         return super(MACAddressField, self).formfield(**defaults)
 
-class IP(models.Model):
+class IPNetwork(models.Model):
     netmasks = (
         ('255.255.255.252', '255.255.255.252'),
         ('255.255.255.248', '255.255.255.248'),

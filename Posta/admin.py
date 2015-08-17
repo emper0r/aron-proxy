@@ -1,6 +1,5 @@
 from django.contrib import admin, messages
 from Posta.models import VeximDomains, VeximUsers
-from License.models import License
 
 class VeximDomainAdmin(admin.ModelAdmin):
     list_display = ('domain', 'enabled', 'avscan', 'spamassassin', 'max_accounts')
@@ -45,8 +44,3 @@ class VeximUserAdmin(admin.ModelAdmin):
         else:
             messages.set_level(request, messages.ERROR)
             messages.error(request, "E' stato riaggiunto il massimo accounts.")
-
-k = License.objects.all().count()
-if k > 0:
-    admin.site.register(VeximDomains, VeximDomainAdmin)
-    admin.site.register(VeximUsers, VeximUserAdmin)

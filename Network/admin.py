@@ -1,14 +1,12 @@
-from django.contrib import admin
 from django.contrib import messages
 from django.conf import settings
 from singlemodeladmin import SingleModelAdmin
-from License.models import License
-from Network.models import IP
+from Network.models import IPNetwork
 import os
 import iptools
 
 
-class IPAdmin(SingleModelAdmin):
+class IPNetworkAdmin(SingleModelAdmin):
     fieldsets = (
         ('Internet', {
             'fields': ('ip_wan', 'mask_wan', 'gateway', 'dns1', 'dns2')
@@ -64,7 +62,7 @@ class IPAdmin(SingleModelAdmin):
                 dhcp_conf.write(str(parameters))
                 dhcp_conf.close()
                 self.dhcp_run()
-                super(IPAdmin, self).save_model(request, obj, form, change)
+                super(IPNetworkAdmin, self).save_model(request, obj, form, change)
             else:
                 messages.set_level(request, messages.ERROR)
                 messages.error(request, "Questo rango non apartiene all'interfaccia LAN.")
@@ -73,12 +71,8 @@ class IPAdmin(SingleModelAdmin):
             messages.error(request, "Il gateway e' sbagliato.")
 
     def dhcp_run(self):
-        service = IP.objects.all()
+        service = IPNetwork.objects.all()
         if service.values()[0]['dhcp'] is True:
             os.system('/etc/init.d/isc-dhcp-server restart')
         else:
             os.system('/etc/init.d/isc-dhcp-server stop')
-
-k = License.objects.all().count()
-if k > 0:
-    admin.site.register(IP, IPAdmin)
