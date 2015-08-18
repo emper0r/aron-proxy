@@ -32,25 +32,23 @@ class IPNetworkAdmin(SingleModelAdmin):
         dns2 = form.cleaned_data['dns2']
         dhcp_range = iptools.IpRange(ip_wan + '/' + mask_wan)
         if gateway in dhcp_range:
-            network_conf = open(settings.NETWORK_CONF, 'w')
-            parameters = 'auto lo eth0 eth1\n' \
-                         'iface lo inet loopback\n' \
-                         'iface eth0 inet static\n' \
-                         '\taddress ' + ip_wan + '\n' \
-                         '\tnetwork ' + mask_wan + '\n' \
-                         '\tgateway ' + gateway + '\n\n' \
-                         '\tdns-servers ' + dns1 + ' ' + dns2 + '\n\n' \
-                         'iface eth1 inet static\n' \
-                         '\taddress ' + ip_lan + '\n' \
-                         '\tnetwork ' + mask_lan + '\n'
-            network_conf.write(str(parameters))
-            network_conf.close()
-            time.sleep(4)
-            os.system("sudo /etc/network/networking restart")
             if ip_start == ip_lan:
                 messages.set_level(request, messages.ERROR)
                 messages.error(request, "Il IP iniziale non puo' essere uguale dal IP LAN")
             else:
+                network_conf = open(settings.NETWORK_CONF, 'w')
+                parameters = 'auto lo eth0 eth1\n' \
+                             'iface lo inet loopback\n' \
+                             'iface eth0 inet static\n' \
+                             '\taddress ' + ip_wan + '\n' \
+                             '\tnetwork ' + mask_wan + '\n' \
+                             '\tgateway ' + gateway + '\n\n' \
+                             '\tdns-servers ' + dns1 + ' ' + dns2 + '\n\n' \
+                             'iface eth1 inet static\n' \
+                             '\taddress ' + ip_lan + '\n' \
+                             '\tnetwork ' + mask_lan + '\n'
+                network_conf.write(str(parameters))
+                network_conf.close()
                 dhcp_range = iptools.IpRange(ip_lan + '/' + mask_lan)
                 if ip_start in dhcp_range and ip_end in dhcp_range:
                     dhcp_conf = open(settings.DHCP_CONF, 'w')
@@ -67,6 +65,8 @@ class IPNetworkAdmin(SingleModelAdmin):
                                  '}\n'
                     dhcp_conf.write(str(parameters))
                     dhcp_conf.close()
+                    time.sleep(4)
+                    os.system("sudo /etc/network/networking restart")
                     self.dhcp_run()
                     super(IPNetworkAdmin, self).save_model(request, obj, form, change)
                 else:
