@@ -116,27 +116,27 @@ class License(models.Model):
                 ('VT', 'Viterbo'))
     client = models.CharField('Nome cliente', max_length=64, help_text="Nominativo cliente")
     province = models.CharField('Provincia', max_length=16, choices=PROVINCE, help_text="Seleziona la provincia")
-    lic_a = models.CharField('Licenza A', max_length=64, help_text="Inserice il codice licenza")
-    lic_b = models.CharField('Licenza B', max_length=64, help_text="Inserice il codice licenza")
+    req = models.CharField('Richiesta', max_length=64, help_text="Inserice il codice licenza")
+    lic = models.CharField('Licenza', max_length=64, help_text="Inserice il codice licenza")
     exp_date = datetime.datetime.today() + (year * 3)
     exp_lic = models.DateField('Scandenza licenza', default=exp_date)
 
     def __str__(self):
         return self.client
 
-    def masq_A(self):
+    def masq_req(self):
         lic_items = License.objects.all()
-        lic_a = lic_items.values()[0]['lic_a']
-        return str(lic_a).replace(lic_a, '*' * len(lic_a))
+        req = lic_items.values()[0]['req']
+        return str(req).replace(req, '*' * len(req))
 
-    masq_A.short_description = 'Licenza A'
+    masq_req.short_description = 'Richiesta'
 
-    def masq_B(self):
+    def masq_lic(self):
         lic_items = License.objects.all()
-        lic_b = lic_items.values()[0]['lic_b']
-        return str(lic_b).replace(lic_b, '*' * len(lic_b))
+        lic = lic_items.values()[0]['lic']
+        return str(lic).replace(lic, '*' * len(lic))
 
-    masq_B.short_description = 'Licenza B'
+    masq_lic.short_description = 'Licenza'
 
-    lic_masq_a = property(masq_A)
-    lic_masq_b = property(masq_B)
+    lic_masq_a = property(masq_req)
+    lic_masq_b = property(masq_lic)

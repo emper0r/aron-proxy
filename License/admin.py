@@ -25,18 +25,18 @@ admin.site.unregister(Group)
 class LicAdmin(SingleModelAdmin):
     k = License.objects.all().count()
     if k > 0:
-        readonly_fields = ('client', 'province', 'masq_A', 'masq_B', 'exp_lic')
-        exclude = ('lic_a', 'lic_b')
+        readonly_fields = ('client', 'province', 'masq_req', 'masq_lic', 'exp_lic')
+        exclude = ('req', 'lic')
     else:
-        list_display = ('lic_a', 'lic_b')
+        list_display = ('req', 'lic')
         exclude = ('exp_lic',)
 
     def save_model(self, request, obj, form, change):
         k = License.objects.all().count()
         if k is 0:
-            lic_a = form.cleaned_data['lic_a']
-            lic_b = form.cleaned_data['lic_b']
-            check_lic = key.validate(lic_a, lic_b)
+            req = form.cleaned_data['req']
+            lic = form.cleaned_data['lic']
+            check_lic = key.validate(req, lic)
             if check_lic is 0:
                 super(LicAdmin, self).save_model(request, obj, form, change)
                 messages.set_level(request, messages.SUCCESS)
