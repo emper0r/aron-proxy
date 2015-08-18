@@ -4,6 +4,7 @@ from singlemodeladmin import SingleModelAdmin
 from Network.models import IPNetwork
 import os
 import iptools
+import time
 
 
 class IPNetworkAdmin(SingleModelAdmin):
@@ -44,28 +45,33 @@ class IPNetworkAdmin(SingleModelAdmin):
                          '\tnetwork ' + mask_lan + '\n'
             network_conf.write(str(parameters))
             network_conf.close()
-            os.system("/etc/network/interfaces restart")
-            dhcp_range = iptools.IpRange(ip_lan + '/' + mask_lan)
-            if ip_start in dhcp_range and ip_end in dhcp_range:
-                dhcp_conf = open(settings.DHCP_CONF, 'w')
-                parameters = 'ddns-update-style none;\n' \
-                             'authoritative;\n' \
-                             'option domain-name "aron.local";\n' \
-                             'option domain-name-servers ' + dns1 +', ' + dns2 + ';\n' \
-                             'default-lease-time 600;\n' \
-                             'max-lease-time 7200;\n' \
-                             'log-facility local7;\n\n' \
-                             'subnet ' + ip_lan + ' netmask ' + mask_lan + ' { \n' \
-                             '\trange ' + ip_start + ' ' + ip_end + ';\n' \
-                             '\toption routers ' + ip_lan + ';\n' \
-                             '}\n'
-                dhcp_conf.write(str(parameters))
-                dhcp_conf.close()
-                self.dhcp_run()
-                super(IPNetworkAdmin, self).save_model(request, obj, form, change)
-            else:
+            time.sleep(4)
+            os.system("sudo /etc/network/interfaces restart")
+            if ip_start == ip_lan:
                 messages.set_level(request, messages.ERROR)
-                messages.error(request, "Questo rango non apartiene all'interfaccia LAN.")
+                messages.error(request, "Il IP iniziale non puo' essere uguale dal IP LAN")
+            else:
+                dhcp_range = iptools.IpRange(ip_lan + '/' + mask_lan)
+                if ip_start in dhcp_range and ip_end in dhcp_range:
+                    dhcp_conf = open(settings.DHCP_CONF, 'w')
+                    parameters = 'ddns-update-style none;\n' \
+                                 'authoritative;\n' \
+                                 'option domain-name "aron.local";\n' \
+                                 'option domain-name-servers ' + dns1 +', ' + dns2 + ';\n' \
+                                 'default-lease-time 600;\n' \
+                                 'max-lease-time 7200;\n' \
+                                 'log-facility local7;\n\n' \
+                                 'subnet ' + ip_lan + ' netmask ' + mask_lan + ' { \n' \
+                                 '\trange ' + ip_start + ' ' + ip_end + ';\n' \
+                                 '\toption routers ' + ip_lan + ';\n' \
+                                 '}\n'
+                    dhcp_conf.write(str(parameters))
+                    dhcp_conf.close()
+                    self.dhcp_run()
+                    super(IPNetworkAdmin, self).save_model(request, obj, form, change)
+                else:
+                    messages.set_level(request, messages.ERROR)
+                    messages.error(request, "Questo rango non apartiene all'interfaccia LAN.")
         else:
             messages.set_level(request, messages.ERROR)
             messages.error(request, "Il gateway e' sbagliato.")
@@ -73,6 +79,6 @@ class IPNetworkAdmin(SingleModelAdmin):
     def dhcp_run(self):
         service = IPNetwork.objects.all()
         if service.values()[0]['dhcp'] is True:
-            os.system('/etc/init.d/isc-dhcp-server restart')
+            os.system('sudo /etc/init.d/isc-dhcp-server restart')
         else:
-            os.system('/etc/init.d/isc-dhcp-server stop')
+            os.system('sudo /etc/init.d/isc-dhcp-server stop')
