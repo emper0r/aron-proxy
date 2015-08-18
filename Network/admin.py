@@ -53,7 +53,7 @@ class IPNetworkAdmin(SingleModelAdmin):
                 if ip_start in dhcp_range and ip_end in dhcp_range:
                     dhcp_conf = open(settings.DHCP_CONF, 'w')
                     n2p = iptools.ipv4.netmask2prefix(mask_lan)
-                    subnet_lan = iptools.ipv4.cidr2block(ip_lan + '/' + n2p)
+                    subnet_lan = iptools.ipv4.cidr2block(ip_lan + '/' + str(n2p))
                     parameters = 'ddns-update-style none;\n' \
                                  'authoritative;\n' \
                                  'option domain-name "aron.local";\n' \
