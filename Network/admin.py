@@ -66,7 +66,7 @@ class IPNetworkAdmin(SingleModelAdmin):
                     dhcp_conf.write(str(parameters))
                     dhcp_conf.close()
                     time.sleep(4)
-                    os.system("sudo /etc/network/networking restart")
+                    os.system("sudo /etc/init.d/networking restart")
                     self.dhcp_run()
                     super(IPNetworkAdmin, self).save_model(request, obj, form, change)
                 else:
