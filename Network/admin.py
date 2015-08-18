@@ -61,7 +61,7 @@ class IPNetworkAdmin(SingleModelAdmin):
                                  'default-lease-time 600;\n' \
                                  'max-lease-time 7200;\n' \
                                  'log-facility local7;\n\n' \
-                                 'subnet ' + subnet_lan[0] + ' netmask ' + subnet_lan[1] + ' { \n' \
+                                 'subnet ' + subnet_lan[0] + ' netmask ' + mask_lan + ' { \n' \
                                  '\trange ' + ip_start + ' ' + ip_end + ';\n' \
                                  '\toption routers ' + ip_lan + ';\n' \
                                  '}\n'
