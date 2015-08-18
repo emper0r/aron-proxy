@@ -52,6 +52,7 @@ class IPNetworkAdmin(SingleModelAdmin):
                 dhcp_range = iptools.IpRange(ip_lan + '/' + mask_lan)
                 if ip_start in dhcp_range and ip_end in dhcp_range:
                     dhcp_conf = open(settings.DHCP_CONF, 'w')
+                    subnet_lan = iptools.ipv4.cidr2block(ip_lan + '/' + mask_lan)
                     parameters = 'ddns-update-style none;\n' \
                                  'authoritative;\n' \
                                  'option domain-name "aron.local";\n' \
@@ -59,16 +60,16 @@ class IPNetworkAdmin(SingleModelAdmin):
                                  'default-lease-time 600;\n' \
                                  'max-lease-time 7200;\n' \
                                  'log-facility local7;\n\n' \
-                                 'subnet ' + ip_lan + ' netmask ' + mask_lan + ' { \n' \
+                                 'subnet ' + subnet_lan[0] + ' netmask ' + subnet_lan[1] + ' { \n' \
                                  '\trange ' + ip_start + ' ' + ip_end + ';\n' \
                                  '\toption routers ' + ip_lan + ';\n' \
                                  '}\n'
                     dhcp_conf.write(str(parameters))
                     dhcp_conf.close()
-                    time.sleep(4)
-                    os.system("sudo /etc/init.d/networking restart")
-                    self.dhcp_run()
                     super(IPNetworkAdmin, self).save_model(request, obj, form, change)
+                    time.sleep(4)
+                    os.system("sudo service networking reload")
+                    self.dhcp_run()
                 else:
                     messages.set_level(request, messages.ERROR)
                     messages.error(request, "Questo rango non apartiene all'interfaccia LAN.")
@@ -79,6 +80,6 @@ class IPNetworkAdmin(SingleModelAdmin):
     def dhcp_run(self):
         service = IPNetwork.objects.all()
         if service.values()[0]['dhcp'] is True:
-            os.system('sudo /etc/init.d/isc-dhcp-server restart')
+            os.system('sudo service isc-dhcp-server restart')
         else:
-            os.system('sudo /etc/init.d/isc-dhcp-server stop')
+            os.system('sudo service isc-dhcp-server stop')
