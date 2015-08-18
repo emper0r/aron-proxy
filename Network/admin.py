@@ -46,7 +46,7 @@ class IPNetworkAdmin(SingleModelAdmin):
             network_conf.write(str(parameters))
             network_conf.close()
             time.sleep(4)
-            os.system("sudo /etc/network/interfaces restart")
+            os.system("sudo /etc/network/networking restart")
             if ip_start == ip_lan:
                 messages.set_level(request, messages.ERROR)
                 messages.error(request, "Il IP iniziale non puo' essere uguale dal IP LAN")
