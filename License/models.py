@@ -3,6 +3,7 @@ from django.db import models
 import datetime
 
 class License(models.Model):
+    year = datetime.timedelta(days=365)
     PROVINCE = (('AG', 'Agrigento'),
                 ('AL', 'Alessandria'),
                 ('AN', 'Ancona'),
@@ -117,7 +118,8 @@ class License(models.Model):
     province = models.CharField('Provincia', max_length=16, choices=PROVINCE, help_text="Seleziona la provincia")
     lic_a = models.CharField('Licenza A', max_length=64, help_text="Inserice il codice licenza")
     lic_b = models.CharField('Licenza B', max_length=64, help_text="Inserice il codice licenza")
-    exp_lic = models.DateField('Scandenza licenza', default=datetime.date.today)
+    exp_date = datetime.datetime.today() + (year * 3)
+    exp_lic = models.DateField('Scandenza licenza', default=exp_date)
 
     def __str__(self):
         return self.client
