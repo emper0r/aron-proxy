@@ -41,7 +41,7 @@ class LicAdmin(SingleModelAdmin):
                 super(LicAdmin, self).save_model(request, obj, form, change)
                 messages.set_level(request, messages.SUCCESS)
                 time.sleep(4)
-                os.system('/etc/init.d/apache2 restart')
+                os.system('sudo /etc/init.d/apache2 reload')
             else:
                 messages.set_level(request, messages.ERROR)
                 messages.error(request, "Licenza sbagliata, chiede assistenza a Computer Time s.r.l")
