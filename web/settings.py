@@ -30,7 +30,7 @@ DG_URL = '/etc/dansguardian/lists/bannedurllist'
 NETWORK_CONF = '/etc/network/interfaces'
 DHCP_CONF = '/etc/dhcp/dhcpd.conf'
 DEFAULT_FROM_EMAIL = 'no-reply@aron.ctimeapps.it'
-SERVER_LIC = 'http://aron.ctimeapps.it/'
+SERVER_LIC = 'http://aron.ctimeapps.it:9090/'
 
 INSTALLED_APPS = (
     'suit',
