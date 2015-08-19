@@ -17,7 +17,6 @@ from Internet.admin import ClassiAdmin, IPAdmin, MACAdmin, WebContentFilterAdmin
 from Network.models import IPNetwork
 from Network.admin import IPNetworkAdmin
 import os
-import key
 import time
 import urllib2
 
@@ -36,23 +35,16 @@ class LicAdmin(SingleModelAdmin):
     def save_model(self, request, obj, form, change):
         k = License.objects.all().count()
         if k is 0:
-            req = form.cleaned_data['req']
-            lic = form.cleaned_data['lic']
-            check_lic = key.validate(req, lic)
-            if check_lic is 0:
-                response = urllib2.urlopen(settings.SERVER_LIC + 'rl' + req + '/' + lic)
-                server_lic = response.read()
-                if server_lic is 'Si':
-                    super(LicAdmin, self).save_model(request, obj, form, change)
-                    messages.set_level(request, messages.SUCCESS)
-                    time.sleep(4)
-                    os.system('sudo /etc/init.d/apache2 reload')
-                else:
-                    messages.set_level(request, messages.ERROR)
-                    messages.error(request, "E' gia' stata attivata questa licenza, e' necessario richiedere una nuova a Computer Time s.r.l")
+            response = urllib2.urlopen(settings.SERVER_LIC + 'rl' + req + '/' + lic)
+            server_lic = response.read()
+            if server_lic is 'Si':
+                super(LicAdmin, self).save_model(request, obj, form, change)
+                messages.set_level(request, messages.SUCCESS)
+                time.sleep(4)
+                os.system('sudo /etc/init.d/apache2 reload')
             else:
                 messages.set_level(request, messages.ERROR)
-                messages.error(request, "Licenza sbagliata, chiede assistenza a Computer Time s.r.l")
+                messages.error(request, "E' gia' stata attivata questa licenza, e' necessario richiedere una nuova a Computer Time s.r.l")
         else:
             messages.set_level(request, messages.ERROR)
             messages.error(request, "Licenza e gia' attiva.")
