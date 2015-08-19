@@ -20,9 +20,6 @@ import os
 import time
 import urllib2
 
-admin.site.unregister(User)
-admin.site.unregister(Group)
-
 class LicAdmin(SingleModelAdmin):
     k = License.objects.all().count()
     if k > 0:
@@ -52,12 +49,14 @@ class LicAdmin(SingleModelAdmin):
             messages.set_level(request, messages.ERROR)
             messages.error(request, "Licenza e gia' attiva.")
 
+if License.objects.all().count() is 0:
+    admin.site.unregister(User)
+    admin.site.unregister(Group)
+
 admin.site.register(License, LicAdmin)
 admin.site.register(IPNetwork, IPNetworkAdmin)
 
 if License.objects.all().count() > 0:
-    admin.site.register(User)
-    admin.site.register(Group)
     admin.site.register(Classi, ClassiAdmin)
     admin.site.register(IP, IPAdmin)
     admin.site.register(MAC, MACAdmin)
