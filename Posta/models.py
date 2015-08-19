@@ -126,7 +126,7 @@ class VeximUsers(models.Model):
                             default=settings.VEXIM_TYPE)
 
     def __unicode__(self):
-        return unicode(' ')
+        return unicode(self.user)
 
     class Meta:
         verbose_name = "Account"

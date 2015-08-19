@@ -2,7 +2,7 @@ from django.contrib import admin
 from singlemodeladmin import SingleModelAdmin
 
 class ClassiAdmin(admin.ModelAdmin):
-    list_display = ('group', 'internet')
+    list_display = ('classi', 'internet')
     list_filter = ('internet',)
 
     def get_queryset(self, request):
@@ -16,13 +16,13 @@ class ProfessoriAdmin(admin.ModelAdmin):
 
 
 class IPAdmin(admin.ModelAdmin):
-    list_display = ('ip', 'groups',)
-    list_filter = ('groups',)
+    list_display = ('ip', 'classi',)
+    list_filter = ('classi',)
 
 
 class MACAdmin(admin.ModelAdmin):
-    list_display = ('mac', 'groups',)
-    list_filter = ('groups',)
+    list_display = ('mac', 'classi',)
+    list_filter = ('classi',)
 
 
 class WebContentFilterAdmin(SingleModelAdmin):
@@ -45,4 +45,3 @@ class WebContentFilterAdmin(SingleModelAdmin):
 
 class NewDevicesAdmin(admin.ModelAdmin):
     pass
-

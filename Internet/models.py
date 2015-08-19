@@ -44,7 +44,7 @@ class MACAddressField(models.Field):
         return super(MACAddressField, self).formfield(**defaults)
 
 class Classi(models.Model):
-    group = models.CharField('Nome della Classe',
+    classi = models.CharField('Nome della Classe',
                              max_length='20',
                              unique=True,
                              help_text='Obbligatorio. Identificativo della Classe')
@@ -62,7 +62,7 @@ class Classi(models.Model):
 
 class Professori(models.Model):
     professori = models.ForeignKey(User)
-    group = models.ManyToManyField(Classi)
+    classi = models.ManyToManyField(Classi)
 
     def __unicode__(self):
         return unicode(self.professori)
@@ -71,7 +71,7 @@ class Professori(models.Model):
         verbose_name_plural = "Classi a Docente"
 
 class IP(models.Model):
-    groups = models.ForeignKey(Classi)
+    classi = models.ForeignKey(Classi)
     ip = models.GenericIPAddressField('Indirizzo IP',
                                       unique=True,
                                       max_length=15,
@@ -90,7 +90,7 @@ class IP(models.Model):
         update_squid()
 
 class MAC(models.Model):
-    groups = models.ForeignKey(Classi)
+    classi = models.ForeignKey(Classi)
     mac = MACAddressField('Indirizzo MAC',
                           blank=False,
                           unique=True,
