@@ -116,7 +116,7 @@ class License(models.Model):
                 ('VT', 'Viterbo'))
     client = models.CharField('Nome cliente', max_length=64, help_text="Nominativo cliente")
     province = models.CharField('Provincia', max_length=16, choices=PROVINCE, help_text="Seleziona la provincia")
-    req = models.CharField('Richiesta', max_length=64, help_text="Inserice il codice licenza")
+    req = models.CharField('Richiesta', max_length=64, help_text="Inserice il codice richiesta")
     lic = models.CharField('Licenza', max_length=64, help_text="Inserice il codice licenza")
     exp_date = datetime.datetime.today() + (year * 3)
     exp_lic = models.DateField('Scandenza licenza', default=exp_date)

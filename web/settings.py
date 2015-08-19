@@ -8,9 +8,6 @@ ALLOWED_HOSTS = ['aron.ctimeapps.it']
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 ROOT_URLCONF = 'web.urls'
 WSGI_APPLICATION = 'web.wsgi.application'
-#STATICFILES_DIRS = (
-#  os.path.join(SITE_ROOT, 'static/'),
-#)
 STATIC_URL = '/static/'
 STATIC_ROOT = SITE_ROOT + STATIC_URL
 LANGUAGE_CODE = 'it-it'
@@ -33,6 +30,7 @@ DG_URL = '/etc/dansguardian/lists/bannedurllist'
 NETWORK_CONF = '/etc/network/interfaces'
 DHCP_CONF = '/etc/dhcp/dhcpd.conf'
 DEFAULT_FROM_EMAIL = 'no-reply@aron.ctimeapps.it'
+SERVER_LIC = 'http://aron.ctimeapps.it/'
 
 INSTALLED_APPS = (
     'suit',

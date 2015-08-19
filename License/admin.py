@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import User
 from django.contrib.auth.admin import Group
 from django.contrib import messages
+from django.conf import settings
 from singlemodeladmin import SingleModelAdmin
 from License.models import License
 from Posta.models import VeximDomains, VeximUsers
@@ -18,6 +19,7 @@ from Network.admin import IPNetworkAdmin
 import os
 import key
 import time
+import urllib2
 
 admin.site.unregister(User)
 admin.site.unregister(Group)
@@ -38,10 +40,16 @@ class LicAdmin(SingleModelAdmin):
             lic = form.cleaned_data['lic']
             check_lic = key.validate(req, lic)
             if check_lic is 0:
-                super(LicAdmin, self).save_model(request, obj, form, change)
-                messages.set_level(request, messages.SUCCESS)
-                time.sleep(4)
-                os.system('sudo /etc/init.d/apache2 reload')
+                response = urllib2.urlopen(settings.SERVER_LIC + 'rl' + req + '/' + lic)
+                server_lic = response.read()
+                if server_lic is 'Si':
+                    super(LicAdmin, self).save_model(request, obj, form, change)
+                    messages.set_level(request, messages.SUCCESS)
+                    time.sleep(4)
+                    os.system('sudo /etc/init.d/apache2 reload')
+                else:
+                    messages.set_level(request, messages.ERROR)
+                    messages.error(request, "E' gia' stata attivata questa licenza, e' necessario richiedere una nuova a Computer Time s.r.l")
             else:
                 messages.set_level(request, messages.ERROR)
                 messages.error(request, "Licenza sbagliata, chiede assistenza a Computer Time s.r.l")
@@ -50,6 +58,8 @@ class LicAdmin(SingleModelAdmin):
             messages.error(request, "Licenza e gia' attiva.")
 
 admin.site.register(License, LicAdmin)
+admin.site.register(IPNetwork, IPNetworkAdmin)
+
 if License.objects.all().count() > 0:
     admin.site.register(User)
     admin.site.register(Group)
@@ -59,6 +69,5 @@ if License.objects.all().count() > 0:
     admin.site.register(WebContentFilter, WebContentFilterAdmin)
     admin.site.register(Professori, ProfessoriAdmin)
     admin.site.register(NewDevices, NewDevicesAdmin)
-    admin.site.register(IPNetwork, IPNetworkAdmin)
     admin.site.register(VeximDomains, VeximDomainAdmin)
     admin.site.register(VeximUsers, VeximUserAdmin)
