@@ -4,21 +4,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 from django import forms
+import subprocess
 import re
 import os
 
 MAC_RE = r'^([0-9a-fA-F]{2}([:]|$)){6}$'
 mac_re = re.compile(MAC_RE)
-
-# class IntegerRangeField(models.IntegerField):
-#     def __init__(self, verbose_name=None, name=None, min_value=None, max_value=None, **kwargs):
-#         self.min_value, self.max_value = min_value, max_value
-#         models.IntegerField.__init__(self, verbose_name, name, **kwargs)
-#
-#     def formfield(self, **kwargs):
-#         defaults = {'min_value': self.min_value, 'max_value':self.max_value}
-#         defaults.update(kwargs)
-#         return super(IntegerRangeField, self).formfield(**defaults)
 
 class MACAddressFormField(forms.fields.RegexField):
     default_error_messages = {
@@ -51,7 +42,7 @@ class Classi(models.Model):
     internet = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.group
+        return self.classi
 
     class Meta:
         verbose_name_plural = "Gestione - Classi"
@@ -245,12 +236,12 @@ def update_squid():
                  'forwarded_for off' \
                  'cache_access_log /var/log/squid3/access.log common'
     file_ip_group_allow = open(settings.SQUID_DIR + 'classes_allow', 'w')
-    internet_yes = IP.objects.all().filter(groups=Classi.objects.all().filter(internet=True))
+    internet_yes = IP.objects.all().filter(classi=Classi.objects.all().filter(internet=True))
     for i in range(0, internet_yes.count()):
         file_ip_group_allow.write(str(internet_yes[i])+'\n')
     file_ip_group_allow.close()
     file_mac_group_allow = open(settings.SQUID_DIR + 'mac_allow', 'w')
-    internet_yes = MAC.objects.all().filter(groups=Classi.objects.all().filter(internet=True))
+    internet_yes = MAC.objects.all().filter(classi=Classi.objects.all().filter(internet=True))
     for i in range(0, internet_yes.count()):
         file_mac_group_allow.write(str(internet_yes[i])+'\n')
     file_mac_group_allow.close()
@@ -260,11 +251,29 @@ def update_squid():
 
 
 class NewDevices(models.Model):
-    classi = models.ForeignKey(Classi)
-    devices = models.ManyToManyField(MAC)
+    devices = MACAddressField(max_length=17)
 
     def __unicode__(self):
-        return unicode(self.classi)
+        return unicode(self.devices)
 
     class Meta:
         verbose_name_plural = "Dispositivi nuovi"
+
+    def new_devices(self):
+        try:
+            count = 0
+            proc = subprocess.Popen('sudo arp -a | cut -d" " -f4', shell=True, stdout=subprocess.PIPE)
+            for line in proc.stdout:
+                item = line.split()
+                try:
+                    mac = MAC(mac=item[0], classi_id=1)
+                    mac.save()
+                    count += 1
+                except:
+                    pass
+            proc.wait()
+            return count
+        except:
+            return
+
+    new_devices.short_description = 'Aggiunto/i'

@@ -42,6 +42,6 @@ class WebContentFilterAdmin(SingleModelAdmin):
                     'updatesites', 'vacation', 'violence', 'virusinfected', 'warez',
                     'weather', 'weapons', 'webmail', 'whitelist')
 
-
 class NewDevicesAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ('new_devices',)
+    exclude = ('devices',)
