@@ -1,5 +1,6 @@
 from django.contrib import admin
 from singlemodeladmin import SingleModelAdmin
+from Internet.models import NewDevices
 
 class ClassiAdmin(admin.ModelAdmin):
     list_display = ('classi', 'internet')
@@ -44,4 +45,9 @@ class WebContentFilterAdmin(SingleModelAdmin):
 
 class NewDevicesAdmin(admin.ModelAdmin):
     readonly_fields = ('new_devices',)
-    exclude = ('devices',)
+    exclude = ('data_import',)
+
+    def save_model(self, request, obj, form, change):
+        aux = NewDevices.objects.all()
+        aux.delete()
+        super(NewDevicesAdmin, self).save_model(request, obj, form, change)
