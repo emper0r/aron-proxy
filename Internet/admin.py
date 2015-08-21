@@ -1,16 +1,40 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from singlemodeladmin import SingleModelAdmin
 from Internet.models import NewDevices
 
 class ClassiAdmin(admin.ModelAdmin):
-    list_display = ('classi', 'internet')
-    list_filter = ('internet',)
-
     def get_queryset(self, request):
         qs = super(ClassiAdmin, self).get_queryset(request)
         if request.user.is_staff and request.user.is_superuser:
             return qs
         return qs.filter(professori__professori=request.user)
+
+    def get_actions(self, request):
+        actions = super(ClassiAdmin, self).get_actions(request)
+        del actions['delete_selected']
+        return actions
+
+    def really_delete_selected(self, request, queryset):
+        for obj in queryset:
+            if obj.classi == 'reservato':
+                messages.set_level(request, messages.ERROR)
+                self.message_user(request,
+                                  "Questo elemento non puo' essere rimosso, apartiene al interno del sistema",
+                                  level=messages.ERROR)
+            else:
+                obj.delete()
+                message_bit = "Elementi cancellato/i"
+                self.message_user(request, "%s" % message_bit)
+
+    really_delete_selected.short_description = 'Cancella elemento/i selezionato/i'
+
+    list_display = ('classi', 'internet')
+    list_filter = ('internet',)
+    actions = [really_delete_selected]
+
+    def __init__(self, *args, **kwargs):
+        super(ClassiAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None, )
 
 class ProfessoriAdmin(admin.ModelAdmin):
     list_display = ('professori',)
