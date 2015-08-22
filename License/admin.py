@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.auth.admin import User
 from django.contrib.auth.admin import Group
 from django.contrib import messages
-from django.conf import settings
 from singlemodeladmin import SingleModelAdmin
 from License.models import License
 from Posta.models import VeximDomains, VeximUsers
@@ -16,15 +15,17 @@ from Internet.models import NewDevices
 from Internet.admin import ClassiAdmin, IPAdmin, MACAdmin, WebContentFilterAdmin, NewDevicesAdmin, ProfessoriAdmin
 from Network.models import IPNetwork
 from Network.admin import IPNetworkAdmin
+from web import settings
 import os
 import time
 import urllib2
+import bf
 
 class LicAdmin(SingleModelAdmin):
     k = License.objects.all().count()
     if k > 0:
-        readonly_fields = ('client', 'province', 'masq_req', 'masq_lic', 'exp_lic')
-        exclude = ('req', 'lic')
+        readonly_fields = ('client', 'province', 'masq_req', 'masq_lic', 'masq_date')
+        exclude = ('req', 'lic', 'exp_lic')
     else:
         list_display = ('req', 'lic')
         exclude = ('client', 'province', 'masq_req', 'masq_lic', 'exp_lic')
@@ -34,11 +35,13 @@ class LicAdmin(SingleModelAdmin):
         if k is 0:
             response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic, timeout=10)
             server_lic = response.read()
-            if server_lic[0] is '0':
-                obj = License.objects.get()
-                obj.client = server_lic[1]
-                obj.province = server_lic[2]
-                obj.save()
+            if server_lic.split()[0] is '0':
+                client = server_lic.split()[1]
+                province = server_lic.split()[2]
+                date = bf.crypt(server_lic.split()[3])
+                req = bf.crypt(obj.req)
+                lic = bf.crypt(obj.lic)
+                License.objects.create(client=client, province=province, req=req, lic=lic, exp_lic=date)
                 super(LicAdmin, self).save_model(request, obj, form, change)
                 messages.set_level(request, messages.SUCCESS)
                 time.sleep(4)
