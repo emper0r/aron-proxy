@@ -20,6 +20,7 @@ import os
 import time
 import urllib2
 import bf
+import key
 
 class LicAdmin(SingleModelAdmin):
     k = License.objects.all().count()
@@ -39,6 +40,7 @@ class LicAdmin(SingleModelAdmin):
                 client = server_lic.split()[1]
                 province = server_lic.split()[2]
                 date = bf.crypt(server_lic.split()[3])
+                key.validate(obj.req, obj.lic)
                 req = bf.crypt(obj.req)
                 lic = bf.crypt(obj.lic)
                 License.objects.create(client=client, province=province, req=req, lic=lic, exp_lic=date)
@@ -64,11 +66,17 @@ admin.site.register(License, LicAdmin)
 admin.site.register(IPNetwork, IPNetworkAdmin)
 
 if License.objects.all().count() > 0:
-    admin.site.register(Classi, ClassiAdmin)
-    admin.site.register(IP, IPAdmin)
-    admin.site.register(MAC, MACAdmin)
-    admin.site.register(WebContentFilter, WebContentFilterAdmin)
-    admin.site.register(Professori, ProfessoriAdmin)
-    admin.site.register(NewDevices, NewDevicesAdmin)
-    admin.site.register(VeximDomains, VeximDomainAdmin)
-    admin.site.register(VeximUsers, VeximUserAdmin)
+    try:
+        obj = License.objects.get()
+        assert key.validate(obj.req, obj.lic)
+        admin.site.register(Classi, ClassiAdmin)
+        admin.site.register(IP, IPAdmin)
+        admin.site.register(MAC, MACAdmin)
+        admin.site.register(WebContentFilter, WebContentFilterAdmin)
+        admin.site.register(Professori, ProfessoriAdmin)
+        admin.site.register(NewDevices, NewDevicesAdmin)
+        admin.site.register(VeximDomains, VeximDomainAdmin)
+        admin.site.register(VeximUsers, VeximUserAdmin)
+    except:
+        admin.site.unregister(User)
+        admin.site.unregister(Group)
