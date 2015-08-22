@@ -232,9 +232,9 @@ def update_squid():
                  'http_access allow classes_internet\n' \
                  'http_access allow mac_internet\n' \
                  'http_access deny all\n' \
-                 'visible_hostname firewall' \
-                 'forwarded_for off' \
-                 'cache_access_log /var/log/squid3/access.log common'
+                 'visible_hostname firewall\n' \
+                 'forwarded_for off\n' \
+                 'cache_access_log /var/log/squid3/access.log common\n'
     file_ip_group_allow = open(settings.SQUID_DIR + 'classes_allow', 'w')
     internet_yes = IP.objects.all().filter(classi=Classi.objects.all().filter(internet=True))
     for i in range(0, internet_yes.count()):
