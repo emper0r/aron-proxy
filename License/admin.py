@@ -36,14 +36,13 @@ class LicAdmin(SingleModelAdmin):
         if k is 0:
             response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic, timeout=10)
             server_lic = response.read()
-            if server_lic.split()[0] is '0':
-                client = server_lic.split()[1]
-                province = server_lic.split()[2]
-                date = bf.crypt(server_lic.split()[3])
+            if server_lic[0] is '0':
+                client = map(str.strip, server_lic.split(','))[1]
+                province = map(str.strip, server_lic.split(','))[2]
+                date = bf.crypt(map(str.strip, server_lic.split(','))[3])
                 key.validate(obj.req, obj.lic)
                 req = bf.crypt(obj.req)
                 lic = bf.crypt(obj.lic)
-                License.objects.create(client=client, province=province, req=req, lic=lic, exp_lic=date)
                 super(LicAdmin, self).save_model(request, obj, form, change)
                 messages.set_level(request, messages.SUCCESS)
                 time.sleep(4)
