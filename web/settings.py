@@ -1,3 +1,4 @@
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 import os
 
 ALLOWED_HOSTS = ['aron.ctimeapps.it']
@@ -83,4 +84,8 @@ PASSWORD_HASHERS = (
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = TCP + (
+    'django.core.context_processors.request',
 )

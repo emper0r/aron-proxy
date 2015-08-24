@@ -37,12 +37,12 @@ class LicAdmin(SingleModelAdmin):
             response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic, timeout=10)
             server_lic = response.read()
             if server_lic[0] is '0':
-                client = map(str.strip, server_lic.split(','))[1]
-                province = map(str.strip, server_lic.split(','))[2]
-                date = bf.crypt(map(str.strip, server_lic.split(','))[3])
+                obj.client = map(str.strip, server_lic.split(','))[1]
+                obj.province = map(str.strip, server_lic.split(','))[2]
+                obj.exp_lic = bf.crypt(map(str.strip, server_lic.split(','))[3][:10])
                 key.validate(obj.req, obj.lic)
-                req = bf.crypt(obj.req)
-                lic = bf.crypt(obj.lic)
+                obj.req = bf.crypt(obj.req)
+                obj.lic = bf.crypt(obj.lic)
                 super(LicAdmin, self).save_model(request, obj, form, change)
                 messages.set_level(request, messages.SUCCESS)
                 time.sleep(4)
@@ -67,7 +67,7 @@ admin.site.register(IPNetwork, IPNetworkAdmin)
 if License.objects.all().count() > 0:
     try:
         obj = License.objects.get()
-        assert key.validate(obj.req, obj.lic)
+        assert key.validate(bf.decrypt(obj.req), bf.decrypt(obj.lic)) is 0
         admin.site.register(Classi, ClassiAdmin)
         admin.site.register(IP, IPAdmin)
         admin.site.register(MAC, MACAdmin)
