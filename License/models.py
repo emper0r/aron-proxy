@@ -6,6 +6,7 @@ import bf
 class License(models.Model):
     year = datetime.timedelta(days=365)
     client = models.CharField('Nome cliente', max_length=64)
+    name = models.CharField('Nominativo', max_length=64)
     province = models.CharField('Provincia', max_length=16)
     req = models.CharField('Richiesta', max_length=255, help_text="Inserice il codice richiesta")
     lic = models.CharField('Licenza', max_length=255, help_text="Inserice il codice licenza")

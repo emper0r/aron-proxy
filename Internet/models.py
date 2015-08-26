@@ -59,7 +59,7 @@ class Professori(models.Model):
         return unicode(self.professori)
 
     class Meta:
-        verbose_name_plural = "Classi a Docente"
+        verbose_name_plural = "Associazione Classi a Docente"
 
 class IP(models.Model):
     classi = models.ForeignKey(Classi)

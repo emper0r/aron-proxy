@@ -25,11 +25,11 @@ import key
 class LicAdmin(SingleModelAdmin):
     k = License.objects.all().count()
     if k > 0:
-        readonly_fields = ('client', 'province', 'masq_req', 'masq_lic', 'masq_date')
+        readonly_fields = ('client', 'name', 'province', 'masq_req', 'masq_lic', 'masq_date')
         exclude = ('req', 'lic', 'exp_lic')
     else:
         list_display = ('req', 'lic')
-        exclude = ('client', 'province', 'masq_req', 'masq_lic', 'exp_lic')
+        exclude = ('client', 'name', 'province', 'masq_req', 'masq_lic', 'exp_lic')
 
     def save_model(self, request, obj, form, change):
         k = License.objects.all().count()
@@ -38,8 +38,9 @@ class LicAdmin(SingleModelAdmin):
             server_lic = response.read()
             if server_lic[0] is '0':
                 obj.client = map(str.strip, server_lic.split(','))[1]
-                obj.province = map(str.strip, server_lic.split(','))[2]
-                obj.exp_lic = bf.crypt(map(str.strip, server_lic.split(','))[3][:10])
+                obj.name = map(str.strip, server_lic.split(','))[2]
+                obj.province = map(str.strip, server_lic.split(','))[3]
+                obj.exp_lic = bf.crypt(map(str.strip, server_lic.split(','))[4][:10])
                 key.validate(obj.req, obj.lic)
                 obj.req = bf.crypt(obj.req)
                 obj.lic = bf.crypt(obj.lic)
