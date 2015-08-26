@@ -73,7 +73,7 @@ class IPNetworkAdmin(SingleModelAdmin):
                     self.dhcp_run()
                 else:
                     messages.set_level(request, messages.ERROR)
-                    messages.error(request, "Questo rango non apartiene all'interfaccia LAN.")
+                    messages.error(request, "Questa network non apartiene all'interfaccia LAN.")
         else:
             messages.set_level(request, messages.ERROR)
             messages.error(request, "Il gateway e' sbagliato.")
