@@ -16,7 +16,7 @@ class ClassiAdmin(admin.ModelAdmin):
 
     def really_delete_selected(self, request, queryset):
         for obj in queryset:
-            if obj.classi == 'reservato':
+            if obj.classi == 'autodiscover':
                 messages.set_level(request, messages.ERROR)
                 self.message_user(request,
                                   "Questo elemento non puo' essere rimosso, apartiene al interno del sistema",

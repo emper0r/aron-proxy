@@ -262,7 +262,7 @@ class NewDevices(models.Model):
     def new_devices(self):
         try:
             count = 0
-            proc = subprocess.Popen('sudo arp -a | cut -d" " -f2,4', shell=True, stdout=subprocess.PIPE)
+            proc = subprocess.Popen('sudo arp -a | egrep eth1 | cut -d" " -f2,4', shell=True, stdout=subprocess.PIPE)
             mac = MAC.objects.all()
             ip = IP.objects.all()
             for line in proc.stdout:
