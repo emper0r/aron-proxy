@@ -34,26 +34,31 @@ class LicAdmin(SingleModelAdmin):
     def save_model(self, request, obj, form, change):
         k = License.objects.all().count()
         if k is 0:
-            response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic, timeout=10)
-            server_lic = response.read()
-            if server_lic[0] is '0':
-                obj.client = map(str.strip, server_lic.split(','))[1]
-                obj.name = map(str.strip, server_lic.split(','))[2]
-                obj.province = map(str.strip, server_lic.split(','))[3]
-                obj.exp_lic = bf.crypt(map(str.strip, server_lic.split(','))[4][:10])
-                key.validate(obj.req, obj.lic)
-                obj.req = bf.crypt(obj.req)
-                obj.lic = bf.crypt(obj.lic)
-                super(LicAdmin, self).save_model(request, obj, form, change)
-                messages.set_level(request, messages.SUCCESS)
-                time.sleep(4)
-                os.system('sudo /etc/init.d/apache2 reload')
-            if server_lic[0] is '1':
+            try:
+                assert key.validate(obj.req, obj.lic) is 0
+                response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic, timeout=10)
+                server_lic = response.read()
+                if server_lic[0] is '0':
+                    obj.client = map(str.strip, server_lic.split(','))[1]
+                    obj.name = map(str.strip, server_lic.split(','))[2]
+                    obj.province = map(str.strip, server_lic.split(','))[3]
+                    obj.exp_lic = bf.crypt(map(str.strip, server_lic.split(','))[4][:10])
+                    key.validate(obj.req, obj.lic)
+                    obj.req = bf.crypt(obj.req)
+                    obj.lic = bf.crypt(obj.lic)
+                    super(LicAdmin, self).save_model(request, obj, form, change)
+                    messages.set_level(request, messages.SUCCESS)
+                    time.sleep(4)
+                    os.system('sudo /etc/init.d/apache2 reload')
+                if server_lic[0] is '1':
+                    messages.set_level(request, messages.ERROR)
+                    messages.error(request, "Questa licenza non e' valida, e' necessario richiedere una nuova a Computer Time s.r.l")
+                if server_lic[0] is '2':
+                    messages.set_level(request, messages.ERROR)
+                    messages.error(request, "E' gia' stata attivata questa licenza, e' necessario richiedere una nuova a Computer Time s.r.l")
+            except:
                 messages.set_level(request, messages.ERROR)
                 messages.error(request, "Questa licenza non e' valida, e' necessario richiedere una nuova a Computer Time s.r.l")
-            if server_lic[0] is '2':
-                messages.set_level(request, messages.ERROR)
-                messages.error(request, "E' gia' stata attivata questa licenza, e' necessario richiedere una nuova a Computer Time s.r.l")
         else:
             messages.set_level(request, messages.ERROR)
             messages.error(request, "Licenza e gia' attiva.")
