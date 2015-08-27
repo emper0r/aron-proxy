@@ -1,3 +1,5 @@
+from django.contrib.admin.templatetags.admin_modify import *
+from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
 from django.contrib import admin
 from django.contrib.auth.admin import User
 from django.contrib.auth.admin import Group
@@ -21,6 +23,18 @@ import time
 import urllib2
 import bf
 import key
+
+@register.inclusion_tag('admin/submit_line.html', takes_context=True)
+def submit_row(context):
+    ctx = original_submit_row(context)
+    ctx.update({
+        'show_save_and_add_another': context.get('show_save_and_add_another', ctx['show_save_and_add_another']),
+        'show_save_and_continue': context.get('show_save_and_continue', ctx['show_save_and_continue']),
+        'show_save': context.get('show_save', ctx['show_save']),
+        'show_save_as_new': context.get('show_save_as_new', ctx['show_save_as_new']),
+        'show_delete_link': context.get('show_save_and_add_another', ctx['show_delete_link']),
+        })
+    return ctx
 
 class LicAdmin(SingleModelAdmin):
     k = License.objects.all().count()
@@ -62,6 +76,16 @@ class LicAdmin(SingleModelAdmin):
         else:
             messages.set_level(request, messages.ERROR)
             messages.error(request, "Licenza e gia' attiva.")
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_save'] = False
+        extra_context['show_save_and_continue'] = False
+        extra_context['show_save_and_add_another'] = False
+        extra_context['show_save_as_new'] = False
+        extra_context['show_delete_link'] = False
+        return super(LicAdmin, self).change_view(request, object_id,
+            form_url, extra_context=extra_context)
 
 if License.objects.all().count() is 0:
     admin.site.unregister(User)
