@@ -87,6 +87,15 @@ class LicAdmin(SingleModelAdmin):
         return super(LicAdmin, self).change_view(request, object_id,
             form_url, extra_context=extra_context)
 
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_save'] = True
+        extra_context['show_save_and_continue'] = False
+        extra_context['show_save_and_add_another'] = False
+        extra_context['show_save_as_new'] = False
+        extra_context['show_delete_link'] = False
+        return super(LicAdmin, self).add_view(request, form_url, extra_context=extra_context)
+
 if License.objects.all().count() is 0:
     admin.site.unregister(User)
     admin.site.unregister(Group)
