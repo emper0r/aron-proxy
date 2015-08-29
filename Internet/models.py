@@ -11,6 +11,7 @@ import os
 MAC_RE = r'^([0-9a-fA-F]{2}([:]|$)){6}$'
 mac_re = re.compile(MAC_RE)
 
+
 class MACAddressFormField(forms.fields.RegexField):
     default_error_messages = {
         'invalid': _(u'Enter a valid MAC address.'),
@@ -47,9 +48,21 @@ class Classi(models.Model):
     class Meta:
         verbose_name_plural = "Gestione - Classi"
 
+    def link_classi(self):
+        room = Classi.objects.all()
+        for c in range(0, room.count()):
+            if self.classi == 'autodiscover':
+                return u"%s" % self.classi
+            else:
+                return u"<a href='%d/'>%s</a>" % (self.id, self.classi)
+
+    link_classi.short_description = ''
+    link_classi.allow_tags = True
+
     def save(self, *args, **kwargs):
         super(Classi, self).save(*args, **kwargs)
         update_squid()
+
 
 class Professori(models.Model):
     professori = models.ForeignKey(User)
@@ -60,6 +73,7 @@ class Professori(models.Model):
 
     class Meta:
         verbose_name_plural = "Associazione Classi a Docente"
+
 
 class IP(models.Model):
     classi = models.ForeignKey(Classi)
@@ -80,6 +94,7 @@ class IP(models.Model):
         super(IP, self).save(*args, **kwargs)
         update_squid()
 
+
 class MAC(models.Model):
     classi = models.ForeignKey(Classi)
     mac = MACAddressField('Indirizzo MAC',
@@ -96,6 +111,7 @@ class MAC(models.Model):
     def save(self, *args, **kwargs):
         super(MAC, self).save(*args, **kwargs)
         update_squid()
+
 
 class WebContentFilter(models.Model):
     abortion = models.BooleanField(default=False, help_text='Abortion information excluding when related to religion')

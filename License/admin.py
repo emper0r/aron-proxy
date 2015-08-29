@@ -24,6 +24,7 @@ import urllib2
 import bf
 import key
 
+
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
     ctx = original_submit_row(context)

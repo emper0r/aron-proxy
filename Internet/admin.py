@@ -1,6 +1,22 @@
+from django.contrib.admin.templatetags.admin_modify import *
+from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
 from django.contrib import admin, messages
 from singlemodeladmin import SingleModelAdmin
 from Internet.models import NewDevices
+
+
+@register.inclusion_tag('admin/submit_line.html', takes_context=True)
+def submit_row(context):
+    ctx = original_submit_row(context)
+    ctx.update({
+        'show_save_and_add_another': context.get('show_save_and_add_another', ctx['show_save_and_add_another']),
+        'show_save_and_continue': context.get('show_save_and_continue', ctx['show_save_and_continue']),
+        'show_save': context.get('show_save', ctx['show_save']),
+        'show_save_as_new': context.get('show_save_as_new', ctx['show_save_as_new']),
+        'show_delete_link': context.get('show_save_and_add_another', ctx['show_delete_link']),
+        })
+    return ctx
+
 
 class ClassiAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
@@ -28,13 +44,14 @@ class ClassiAdmin(admin.ModelAdmin):
 
     really_delete_selected.short_description = 'Cancella elemento/i selezionato/i'
 
-    list_display = ('classi', 'internet')
+    list_display = ('link_classi', 'internet')
     list_filter = ('internet',)
     actions = [really_delete_selected]
 
     def __init__(self, *args, **kwargs):
         super(ClassiAdmin, self).__init__(*args, **kwargs)
         self.list_display_links = (None, )
+
 
 class ProfessoriAdmin(admin.ModelAdmin):
     list_display = ('professori',)
@@ -67,11 +84,35 @@ class WebContentFilterAdmin(SingleModelAdmin):
                     'updatesites', 'vacation', 'violence', 'virusinfected', 'warez',
                     'weather', 'weapons', 'webmail', 'whitelist')
 
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_save'] = True
+        extra_context['show_save_and_continue'] = False
+        extra_context['show_save_and_add_another'] = False
+        extra_context['show_save_as_new'] = False
+        extra_context['show_delete_link'] = False
+        return super(WebContentFilterAdmin, self).add_view(request, form_url, extra_context=extra_context)
+
+
 class NewDevicesAdmin(admin.ModelAdmin):
     readonly_fields = ('new_devices',)
-    exclude = ('data_import',)
+    exclude = ('mac', 'ip')
+
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_save'] = True
+        extra_context['show_save_and_continue'] = False
+        extra_context['show_save_and_add_another'] = False
+        extra_context['show_save_as_new'] = False
+        extra_context['show_delete_link'] = False
+        return super(NewDevicesAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
     def save_model(self, request, obj, form, change):
         aux = NewDevices.objects.all()
         aux.delete()
-        super(NewDevicesAdmin, self).save_model(request, obj, form, change)
+        if aux.count() is 0:
+            messages.set_level(request, messages.ERROR)
+            self.message_user(request, "Non e' stato riaggiunto nessun dispositivo nuovo", level=messages.ERROR)
+            return
+        else:
+            super(NewDevicesAdmin, self).save_model(request, obj, form, change)
