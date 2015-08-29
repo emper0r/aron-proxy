@@ -14,7 +14,7 @@ mac_re = re.compile(MAC_RE)
 
 class MACAddressFormField(forms.fields.RegexField):
     default_error_messages = {
-        'invalid': _(u'Enter a valid MAC address.'),
+        'invalid': _(u'Inserice un indirizzo MAC valido.'),
     }
 
     def __init__(self, *args, **kwargs):
