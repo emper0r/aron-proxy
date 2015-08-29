@@ -23,7 +23,8 @@ import time
 import urllib2
 import bf
 import key
-
+import subprocess
+import hashlib
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
@@ -51,7 +52,23 @@ class LicAdmin(SingleModelAdmin):
         if k is 0:
             try:
                 assert key.validate(obj.req, obj.lic) is 0
-                response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic, timeout=10)
+                uniq_id = open('/tmp/._', 'w')
+                cpu = subprocess.Popen('cat /proc/cpuinfo', shell=True, stdout=subprocess.PIPE)
+                for line in cpu.stdout:
+                    uniq_id.write(line)
+                hardware = subprocess.Popen('sudo lspci -vvv', shell=True, stdout=subprocess.PIPE)
+                for line in hardware.stdout:
+                    uniq_id.write(line)
+                hd = subprocess.Popen('sudo hdparm -i /dev/sda', shell=True, stdout=subprocess.PIPE)
+                for line in hd.stdout:
+                    uniq_id.write(line)
+                ethernet = subprocess.Popen('sudo ifconfig | egrep -i HWaddr | awk \'{print $5}\'', shell=True, stdout=subprocess.PIPE)
+                for line in ethernet.stdout:
+                    uniq_id.write(line)
+                uniq_id.close()
+                server_id = hashlib.md5(uniq_id.name).hexdigest()
+                os.unlink(uniq_id.name)
+                response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic + '/' + server_id, timeout=10)
                 server_lic = response.read()
                 if server_lic[0] is '0':
                     obj.client = map(str.strip, server_lic.split(','))[1]
