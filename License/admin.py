@@ -1,19 +1,12 @@
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
-from django.contrib import admin
-from django.contrib.auth.admin import User
-from django.contrib.auth.admin import Group
-from django.contrib import messages
+from django.contrib import admin, messages
+from django.contrib.auth.admin import User, Group
 from singlemodeladmin import SingleModelAdmin
 from License.models import License
 from Posta.models import VeximDomains, VeximUsers
 from Posta.admin import VeximDomainAdmin, VeximUserAdmin
-from Internet.models import Classi
-from Internet.models import IP
-from Internet.models import MAC
-from Internet.models import WebContentFilter
-from Internet.models import Professori
-from Internet.models import NewDevices
+from Internet.models import Classi, IP, MAC, WebContentFilter, Professori, NewDevices
 from Internet.admin import ClassiAdmin, IPAdmin, MACAdmin, WebContentFilterAdmin, NewDevicesAdmin, ProfessoriAdmin
 from Network.models import IPNetwork
 from Network.admin import IPNetworkAdmin
@@ -25,6 +18,48 @@ import bf
 import key
 import subprocess
 import hashlib
+import threading
+import datetime
+
+def cl():
+    threading.Timer(3600.0, cl).start()
+    act_lic = License.objects.all().count()
+    if act_lic > 0:
+        uniq_id = open('/tmp/._', 'w')
+        cpu = subprocess.Popen('cat /proc/cpuinfo', shell=True, stdout=subprocess.PIPE)
+        for line in cpu.stdout:
+            uniq_id.write(line)
+        hardware = subprocess.Popen('sudo lspci -vvv', shell=True, stdout=subprocess.PIPE)
+        for line in hardware.stdout:
+            uniq_id.write(line)
+        hd = subprocess.Popen('sudo hdparm -i /dev/sda', shell=True, stdout=subprocess.PIPE)
+        for line in hd.stdout:
+            uniq_id.write(line)
+        ethernet = subprocess.Popen('sudo ifconfig | egrep -i HWaddr | awk \'{print $5}\'', shell=True, stdout=subprocess.PIPE)
+        for line in ethernet.stdout:
+            uniq_id.write(line)
+        uniq_id.close()
+        server_id = hashlib.md5(uniq_id.name).hexdigest()
+        response = urllib2.urlopen(settings.SERVER_LIC + 'ci/' + server_id, timeout=10)
+        server_lic = response.read()
+        if server_lic[0] is '0':
+            today = datetime.datetime.today()
+            response = urllib2.urlopen(settings.SERVER_LIC + 'ct/' + str(today)[:10], timeout=10)
+            server_lic = response.read()
+            if server_lic[0] is '0':
+                return
+            else:
+                l = License.objects.get()
+                l.delete()
+                time.sleep(4)
+                os.system('sudo /etc/init.d/apache2 reload')
+        else:
+            l = License.objects.get()
+            l.delete()
+            time.sleep(4)
+            os.system('sudo /etc/init.d/apache2 reload')
+    else:
+        return
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
@@ -124,6 +159,7 @@ admin.site.register(IPNetwork, IPNetworkAdmin)
 if License.objects.all().count() > 0:
     try:
         obj = License.objects.get()
+        cl()
         assert key.validate(bf.decrypt(obj.req), bf.decrypt(obj.lic)) is 0
         admin.site.register(Classi, ClassiAdmin)
         admin.site.register(IP, IPAdmin)
