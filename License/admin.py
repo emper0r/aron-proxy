@@ -101,8 +101,10 @@ class LicAdmin(SingleModelAdmin):
                 for line in ethernet.stdout:
                     uniq_id.write(line)
                 uniq_id.close()
-                server_id = hashlib.md5(uniq_id.name).hexdigest()
-                os.unlink(uniq_id.name)
+                with open(uniq_id) as file_to_check:
+                    data = file_to_check.read()
+                    server_id = hashlib.md5(data).hexdigest()
+                os.system('rm -f %s' % uniq_id)
                 response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic + '/' + server_id, timeout=10)
                 server_lic = response.read()
                 if server_lic[0] is '0':
