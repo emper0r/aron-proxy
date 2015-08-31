@@ -282,19 +282,19 @@ class NewDevices(models.Model):
             for line in proc.stdout:
                 item = line.split()
                 if IP.objects.filter(ip=item[0][1:-1]).exists():
-                    continue
+                    pass
                 else:
                     ip = IP(ip=item[0][1:-1], classi_id=1)
                     ip.save()
                     count += 1
-            for line in proc.stdout:
-                item = line.split()
                 if MAC.objects.filter(mac=item[1]).exists():
-                    continue
+                    pass
                 else:
                     mac = MAC(mac=item[1], classi_id=1)
                     mac.save()
                     count += 1
+            if count > 0:
+                NewDevices.objects.create()
             proc.wait()
             return count
         except:

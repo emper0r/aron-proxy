@@ -109,10 +109,10 @@ class NewDevicesAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         aux = NewDevices.objects.all()
-        aux.delete()
         if aux.count() is 0:
             messages.set_level(request, messages.ERROR)
             self.message_user(request, "Non e' stato riaggiunto nessun dispositivo nuovo", level=messages.ERROR)
             return
         else:
             super(NewDevicesAdmin, self).save_model(request, obj, form, change)
+            aux.delete()
