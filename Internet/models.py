@@ -278,28 +278,20 @@ class NewDevices(models.Model):
     def new_devices(self):
         try:
             count = 0
-            proc = subprocess.Popen('sudo arp -a | egrep eth1 | cut -d" " -f2,4', shell=True, stdout=subprocess.PIPE)
-            mac = MAC.objects.all()
-            ip = IP.objects.all()
+            proc = subprocess.Popen('sudo arp -a | egrep wlan0 | cut -d" " -f2,4', shell=True, stdout=subprocess.PIPE)
             for line in proc.stdout:
                 item = line.split()
-                if ip.count() is 0:
-                    ip = IP(ip=item[0][1:-1], classi_id=1)
-                    ip.save()
-                    count += 1
-                if mac.count() is 0:
-                    mac = MAC(mac=item[1], classi_id=1)
-                    mac.save()
-                    count += 1
-                mac = MAC.objects.all()
-                ip = IP.objects.all()
-                if item[0] in mac.values()[0]['mac']:
-                    continue
-                if item[1] in ip.values()[0]['ip']:
+                if IP.objects.filter(ip=item[0][1:-1]).exists():
                     continue
                 else:
                     ip = IP(ip=item[0][1:-1], classi_id=1)
                     ip.save()
+                    count += 1
+            for line in proc.stdout:
+                item = line.split()
+                if MAC.objects.filter(mac=item[1]).exists():
+                    continue
+                else:
                     mac = MAC(mac=item[1], classi_id=1)
                     mac.save()
                     count += 1
