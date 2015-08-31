@@ -25,11 +25,9 @@ def cl():
     threading.Timer(3600.0, cl).start()
     act_lic = License.objects.all().count()
     if act_lic > 0:
-        uniq_id = open('/tmp/._', 'w')
-        cpu = subprocess.Popen('cat /proc/cpuinfo', shell=True, stdout=subprocess.PIPE)
-        for line in cpu.stdout:
-            uniq_id.write(line)
-        hardware = subprocess.Popen('sudo lspci -vvv', shell=True, stdout=subprocess.PIPE)
+        uniq_file = '/tmp/._'
+        uniq_id = open(uniq_file, 'w')
+        hardware = subprocess.Popen('sudo lspci -vv', shell=True, stdout=subprocess.PIPE)
         for line in hardware.stdout:
             uniq_id.write(line)
         hd = subprocess.Popen('sudo hdparm -i /dev/sda', shell=True, stdout=subprocess.PIPE)
@@ -39,7 +37,10 @@ def cl():
         for line in ethernet.stdout:
             uniq_id.write(line)
         uniq_id.close()
-        server_id = hashlib.md5(uniq_id.name).hexdigest()
+        with open(uniq_file, 'r') as file_to_check:
+            data = file_to_check.read()
+            server_id = hashlib.md5(data).hexdigest()
+        os.system('rm -f %s' % uniq_file)
         response = urllib2.urlopen(settings.SERVER_LIC + 'ci/' + server_id, timeout=10)
         server_lic = response.read()
         if server_lic[0] is '0':
@@ -87,11 +88,9 @@ class LicAdmin(SingleModelAdmin):
         if k is 0:
             try:
                 assert key.validate(obj.req, obj.lic) is 0
-                uniq_id = open('/tmp/._', 'w')
-                cpu = subprocess.Popen('cat /proc/cpuinfo', shell=True, stdout=subprocess.PIPE)
-                for line in cpu.stdout:
-                    uniq_id.write(line)
-                hardware = subprocess.Popen('sudo lspci -vvv', shell=True, stdout=subprocess.PIPE)
+                uniq_file = '/tmp/._'
+                uniq_id = open(uniq_file, 'w')
+                hardware = subprocess.Popen('sudo lspci -vv', shell=True, stdout=subprocess.PIPE)
                 for line in hardware.stdout:
                     uniq_id.write(line)
                 hd = subprocess.Popen('sudo hdparm -i /dev/sda', shell=True, stdout=subprocess.PIPE)
@@ -101,10 +100,10 @@ class LicAdmin(SingleModelAdmin):
                 for line in ethernet.stdout:
                     uniq_id.write(line)
                 uniq_id.close()
-                with open(uniq_id) as file_to_check:
+                with open(uniq_file, 'r') as file_to_check:
                     data = file_to_check.read()
                     server_id = hashlib.md5(data).hexdigest()
-                os.system('rm -f %s' % uniq_id)
+                os.system('rm -f %s' % uniq_file)
                 response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic + '/' + server_id, timeout=10)
                 server_lic = response.read()
                 if server_lic[0] is '0':
