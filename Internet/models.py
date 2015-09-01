@@ -216,8 +216,12 @@ class WebContentFilter(models.Model):
 
 def update_squid():
     proxy_conf = open(settings.SQUID_CONF, 'w')
-    squid_conf = 'http_port 127.0.0.1:3128 intercept\n' \
+    squid_conf = 'http_port 127.0.0.1:3128\n' \
+                 'http_port 127.0.0.1:3129 intercept\n' \
                  'cache_dir aufs /var/cache/squid3 1024 32 256\n' \
+                 'logformat squid_mysql %ts.%03tu %6tr %>a %Ss >Hs %<st %rm %ru %un %Sh %<A %mt' \
+                 'access_log daemon:/localhost/aron/access_log/aron/PasswordOfFantasy squid_mysql' \
+                 'logfile_daemon /usr/lib/squid3/logfile-daemon_mysql.pl' \
                  'coredump_dir /var/cache/squid3\n' \
                  'refresh_pattern ^ftp:             1440    20%     10080\n' \
                  'refresh_pattern ^gopher:  1440    0%      1440\n' \
@@ -250,9 +254,10 @@ def update_squid():
                  'http_access deny all\n' \
                  'visible_hostname firewall\n' \
                  'follow_x_forwarded_for allow all\n' \
-                 'forwarded_for off\n' \
+                 'forwarded_for on\n' \
                  'always_direct allow all\n' \
-                 'cache_access_log /var/log/squid3/access.log common\n'
+                 'pinger_enable off\n' \
+                 'shutdown_lifetime 3600.0'
     file_ip_group_allow = open(settings.SQUID_DIR + 'classes_allow', 'w')
     internet_yes = IP.objects.all().filter(classi=Classi.objects.all().filter(internet=True))
     for i in range(0, internet_yes.count()):
@@ -265,7 +270,7 @@ def update_squid():
     file_mac_group_allow.close()
     proxy_conf.write(squid_conf)
     proxy_conf.close()
-    os.system("squid3 -k parse && squid3 -k reconfigure")
+    os.system("sudo /etc/init.d/squid3 restart")
 
 
 class NewDevices(models.Model):
