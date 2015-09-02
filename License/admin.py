@@ -41,19 +41,10 @@ def cl():
             data = file_to_check.read()
             server_id = hashlib.md5(data).hexdigest()
         os.system('rm -f %s' % uniq_file)
-        response = urllib2.urlopen(settings.SERVER_LIC + 'ci/' + server_id, timeout=10)
+        response = urllib2.urlopen(settings.SERVER_LIC + 'cl/' + server_id, timeout=10)
         server_lic = response.read()
         if server_lic[0] is '0':
-            today = datetime.datetime.today()
-            response = urllib2.urlopen(settings.SERVER_LIC + 'ct/' + str(today)[:10], timeout=10)
-            server_lic = response.read()
-            if server_lic[0] is '0':
-                return
-            else:
-                l = License.objects.get()
-                l.delete()
-                time.sleep(4)
-                os.system('sudo /etc/init.d/apache2 reload')
+            return
         else:
             l = License.objects.get()
             l.delete()
@@ -61,6 +52,8 @@ def cl():
             os.system('sudo /etc/init.d/apache2 reload')
     else:
         return
+
+cl()
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
@@ -160,7 +153,6 @@ admin.site.register(IPNetwork, IPNetworkAdmin)
 if License.objects.all().count() > 0:
     try:
         obj = License.objects.get()
-        cl()
         assert key.validate(bf.decrypt(obj.req), bf.decrypt(obj.lic)) is 0
         admin.site.register(Classi, ClassiAdmin)
         admin.site.register(IP, IPAdmin)
