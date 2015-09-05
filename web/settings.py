@@ -2,7 +2,7 @@ from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 import os
 
 ALLOWED_HOSTS = ['aron.ctimeapps.it']
-DEBUG = True
+DEBUG = False
 DEFAULT_FROM_EMAIL = 'no-reply@aron.ctimeapps.it'
 DG_DOMAIN = '/etc/dansguardian/lists/bannedsitelist'
 DG_URL = '/etc/dansguardian/lists/bannedurllist'
@@ -11,7 +11,7 @@ LANGUAGE_CODE = 'it-it'
 NETWORK_CONF = '/etc/network/interfaces'
 ROOT_URLCONF = 'web.urls'
 SECRET_KEY = 'xz)*53&2z7w_-g_eajchp8p&*m1!9c*synd!^p-z4v9qdb*g%!'
-SERVER_LIC = 'http://127.0.0.1:9090/'
+SERVER_LIC = 'http://aron.ctimeapps.it:9090/'
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 SQUID_CONF = '/etc/squid3/squid.conf'
 SQUID_DIR = '/etc/squid3/'

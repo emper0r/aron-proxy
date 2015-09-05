@@ -39,7 +39,7 @@ def cl():
         with open(uniq_file, 'r') as file_to_check:
             data = file_to_check.read()
             server_id = hashlib.md5(data).hexdigest()
-        # os.system('rm -f %s' % uniq_file)
+        os.system('rm -f %s' % uniq_file)
         response = urllib2.urlopen(settings.SERVER_LIC + 'cl/' + server_id, timeout=10)
         server_lic = response.read()
         if server_lic[0] is '0':
@@ -95,7 +95,7 @@ class LicAdmin(SingleModelAdmin):
                 with open(uniq_file, 'r') as file_to_check:
                     data = file_to_check.read()
                     server_id = hashlib.md5(data).hexdigest()
-                # os.system('rm -f %s' % uniq_file)
+                os.system('rm -f %s' % uniq_file)
                 response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic + '/' + server_id, timeout=10)
                 server_lic = response.read()
                 if server_lic[0] is '0':
