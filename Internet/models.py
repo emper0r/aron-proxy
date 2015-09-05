@@ -219,9 +219,7 @@ def update_squid():
     squid_conf = 'http_port 127.0.0.1:3128\n' \
                  'http_port 127.0.0.1:3129 intercept\n' \
                  'cache_dir aufs /var/cache/squid3 1024 32 256\n' \
-                 'logformat squid_mysql %ts.%03tu %6tr %>a %Ss >Hs %<st %rm %ru %un %Sh %<A %mt' \
-                 'access_log daemon:/localhost/aron/access_log/aron/PasswordOfFantasy squid_mysql' \
-                 'logfile_daemon /usr/lib/squid3/logfile-daemon_mysql.pl' \
+                 'access_log daemon:/var/log/squid3/access.log squid' \
                  'coredump_dir /var/cache/squid3\n' \
                  'refresh_pattern ^ftp:             1440    20%     10080\n' \
                  'refresh_pattern ^gopher:  1440    0%      1440\n' \

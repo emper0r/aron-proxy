@@ -19,7 +19,6 @@ import key
 import subprocess
 import hashlib
 import threading
-import datetime
 
 def cl():
     threading.Timer(3600.0, cl).start()
@@ -27,7 +26,7 @@ def cl():
     if act_lic > 0:
         uniq_file = '/tmp/._'
         uniq_id = open(uniq_file, 'w')
-        hardware = subprocess.Popen('sudo lspci -vv', shell=True, stdout=subprocess.PIPE)
+        hardware = subprocess.Popen('sudo lspci', shell=True, stdout=subprocess.PIPE)
         for line in hardware.stdout:
             uniq_id.write(line)
         hd = subprocess.Popen('sudo hdparm -i /dev/sda', shell=True, stdout=subprocess.PIPE)
@@ -40,7 +39,7 @@ def cl():
         with open(uniq_file, 'r') as file_to_check:
             data = file_to_check.read()
             server_id = hashlib.md5(data).hexdigest()
-        os.system('rm -f %s' % uniq_file)
+        # os.system('rm -f %s' % uniq_file)
         response = urllib2.urlopen(settings.SERVER_LIC + 'cl/' + server_id, timeout=10)
         server_lic = response.read()
         if server_lic[0] is '0':
@@ -83,7 +82,7 @@ class LicAdmin(SingleModelAdmin):
                 assert key.validate(obj.req, obj.lic) is 0
                 uniq_file = '/tmp/._'
                 uniq_id = open(uniq_file, 'w')
-                hardware = subprocess.Popen('sudo lspci -vv', shell=True, stdout=subprocess.PIPE)
+                hardware = subprocess.Popen('sudo lspci', shell=True, stdout=subprocess.PIPE)
                 for line in hardware.stdout:
                     uniq_id.write(line)
                 hd = subprocess.Popen('sudo hdparm -i /dev/sda', shell=True, stdout=subprocess.PIPE)
@@ -96,7 +95,7 @@ class LicAdmin(SingleModelAdmin):
                 with open(uniq_file, 'r') as file_to_check:
                     data = file_to_check.read()
                     server_id = hashlib.md5(data).hexdigest()
-                os.system('rm -f %s' % uniq_file)
+                # os.system('rm -f %s' % uniq_file)
                 response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic + '/' + server_id, timeout=10)
                 server_lic = response.read()
                 if server_lic[0] is '0':
