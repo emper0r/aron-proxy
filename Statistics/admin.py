@@ -1,7 +1,11 @@
 from django.contrib import admin
+from django.conf.urls import patterns
+from Statistics import views
 
 class SquidLogsAdmin(admin.ModelAdmin):
-    exclude = ('proxy_host', 'timestamp', 'date_day', 'date_time',
-               'response_time', 'client_ip', 'squid_status', 'reply_size',
-               'request_method', 'url', 'domain', 'username', 'squid_connect',
-               'server_ip', 'mime_type', 'http_status')
+    def get_urls(self):
+        urls = super(SquidLogsAdmin, self).get_urls()
+        my_urls = patterns('',
+                           (r'^$', views.statistics)
+        )
+        return my_urls + urls

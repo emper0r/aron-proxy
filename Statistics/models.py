@@ -23,3 +23,4 @@ class SquidLogs(models.Model):
     class Meta:
         managed = False
         db_table = 'statistics_plog'
+        verbose_name_plural = 'Proxy'
