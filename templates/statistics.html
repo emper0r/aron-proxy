@@ -48,10 +48,11 @@
         <link rel="stylesheet" href="{{ STATIC_URL }}django_tables2/themes/paleblue/css/screen.css">
         {% load render_table from django_tables2 %}
 
-        Top 20 Domains<br>
-        {% render_table top_ten_users %}
+        Top 10 IP<br><br>
+        {% render_table top_10_ip %} <br><br><br>
 
-
+        Top 10 Domains<br><br>
+        {% render_table top_10_domains %} <br>
 
     {% endblock %}
 {% endblock %}

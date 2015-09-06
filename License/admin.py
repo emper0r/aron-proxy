@@ -10,6 +10,8 @@ from Internet.models import Classi, IP, MAC, WebContentFilter, Professori, NewDe
 from Internet.admin import ClassiAdmin, IPAdmin, MACAdmin, WebContentFilterAdmin, NewDevicesAdmin, ProfessoriAdmin
 from Network.models import IPNetwork
 from Network.admin import IPNetworkAdmin
+from Statistics.models import SquidLogs
+from Statistics.admin import SquidLogsAdmin
 from web import settings
 import os
 import time
@@ -161,6 +163,7 @@ if License.objects.all().count() > 0:
         admin.site.register(NewDevices, NewDevicesAdmin)
         admin.site.register(VeximDomains, VeximDomainAdmin)
         admin.site.register(VeximUsers, VeximUserAdmin)
+        admin.site.register(SquidLogs, SquidLogsAdmin)
     except:
         admin.site.unregister(User)
         admin.site.unregister(Group)
