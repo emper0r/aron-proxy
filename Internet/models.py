@@ -218,17 +218,35 @@ def update_squid():
     proxy_conf = open(settings.SQUID_CONF, 'w')
     squid_conf = 'http_port 127.0.0.1:3128\n' \
                  'http_port 127.0.0.1:3129 intercept\n' \
-                 'cache_dir aufs /var/cache/squid3 1024 32 256\n' \
-                 'access_log daemon:/var/log/squid3/access.log squid' \
+                 'cache_dir aufs /var/cache/squid3 500000 256 512\n' \
+                 'access_log daemon:/var/log/squid3/access.log squid\n' \
                  'coredump_dir /var/cache/squid3\n' \
+                 'acl windowsupdate dstdomain windowsupdate.microsoft.com\n' \
+                 'acl windowsupdate dstdomain .update.microsoft.com\n' \
+                 'acl windowsupdate dstdomain download.windowsupdate.com\n' \
+                 'acl windowsupdate dstdomain redir.metaservices.microsoft.com\n' \
+                 'acl windowsupdate dstdomain images.metaservices.microsoft.com\n' \
+                 'acl windowsupdate dstdomain c.microsoft.com\n' \
+                 'acl windowsupdate dstdomain www.download.windowsupdate.com\n' \
+                 'acl windowsupdate dstdomain wustat.windows.com\n' \
+                 'acl windowsupdate dstdomain crl.microsoft.com\n' \
+                 'acl windowsupdate dstdomain sls.microsoft.com\n' \
+                 'acl windowsupdate dstdomain productactivation.one.microsoft.com\n' \
+                 'acl windowsupdate dstdomain ntservicepack.microsoft.com\n' \
+                 'acl wuCONNECT dstdomain www.update.microsoft.com\n' \
+                 'acl wuCONNECT dstdomain sls.microsoft.com\n' \
+                 'range_offset_limit 200 MB windowsupdate\n' \
+                 'maximum_object_size 200 MB\n' \
+                 'quick_abort_min -1\n' \
+                 'refresh_pattern -i microsoft.com/.*\.(cab|exe|ms[i|u|f]|[ap]sf|wm[v|a]|dat|zip) 43200 80% 432000 reload-into-ims\n' \
+                 'refresh_pattern -i windowsupdate.com/.*\.(cab|exe|ms[i|u|f]|[ap]sf|wm[v|a]|dat|zip) 43200 80% 432000 reload-into-ims\n' \
+                 'refresh_pattern -i windows.com/.*\.(cab|exe|ms[i|u|f]|[ap]sf|wm[v|a]|dat|zip) 43200 80% 432000 reload-into-ims\n' \
                  'refresh_pattern ^ftp:             1440    20%     10080\n' \
                  'refresh_pattern ^gopher:  1440    0%      1440\n' \
                  'refresh_pattern -i (/cgi-bin/|\?) 0       0%      0\n' \
                  'refresh_pattern .         0       20%     4320\n' \
                  'acl localnet src fc00::/7\n' \
                  'acl localnet src fe80::/10\n' \
-                 'acl classes_internet src "/etc/squid3/classes_allow"\n' \
-                 'acl mac_internet arp "/etc/squid3/mac_allow"\n' \
                  'acl SSL_ports port 443\n' \
                  'acl Safe_ports port 80\n' \
                  'acl Safe_ports port 21\n' \
@@ -241,21 +259,26 @@ def update_squid():
                  'acl Safe_ports port 591\n' \
                  'acl Safe_ports port 777\n' \
                  'acl CONNECT method CONNECT\n' \
+                 'acl classes_internet src "/etc/squid3/classes_allow"\n' \
+                 'acl mac_internet arp "/etc/squid3/mac_allow"\n' \
                  'http_access deny !Safe_ports\n' \
+                 'http_access allow CONNECT wuCONNECT localnet\n' \
+                 'http_access allow CONNECT wuCONNECT localhost\n' \
+                 'http_access allow CONNECT localhost\n' \
                  'http_access deny CONNECT !SSL_ports\n' \
                  'http_access allow localhost manager\n' \
                  'http_access deny manager\n' \
-                 'http_access allow localnet\n' \
                  'http_access allow localhost\n' \
+                 'http_access allow windowsupdate localnet\n' \
+                 'http_access allow windowsupdate localhost\n' \
                  'http_access allow classes_internet\n' \
                  'http_access allow mac_internet\n' \
                  'http_access deny all\n' \
                  'visible_hostname firewall\n' \
+                 'shutdown_lifetime 3600\n' \
                  'follow_x_forwarded_for allow all\n' \
                  'forwarded_for on\n' \
-                 'always_direct allow all\n' \
-                 'pinger_enable off\n' \
-                 'shutdown_lifetime 3600.0'
+                 'pinger_enable off\n'
     file_ip_group_allow = open(settings.SQUID_DIR + 'classes_allow', 'w')
     internet_yes = IP.objects.all().filter(classi=Classi.objects.all().filter(internet=True))
     for i in range(0, internet_yes.count()):
