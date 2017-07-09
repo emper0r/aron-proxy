@@ -8,17 +8,15 @@ XID_PREFIX = b'\x5f'
 KEY_PREFIX = b'\xba'
 SECRET_PREFIX = b'\xff'
 
+
 def generate_keypair(sk=None):
-    """
-    Generate a random key pair.
-    :return:
-    """
     if sk:
         keypair = libnacl.public.SecretKey(sk=sk)
     else:
         keypair = libnacl.public.SecretKey()
 
     return keypair.pk, keypair.sk
+
 
 def string_to_secret(sk_str):
     val = base58.b58decode(sk_str)
@@ -41,6 +39,7 @@ def string_to_secret(sk_str):
 
     return key
 
+
 def string_to_key(pk_str):
     val = base58.b58decode(pk_str)
 
@@ -62,6 +61,7 @@ def string_to_key(pk_str):
 
     return key
 
+
 def validate(key, secret):
     if key and secret:
         sk = string_to_secret(secret)
@@ -71,6 +71,7 @@ def validate(key, secret):
             return 0
         return 1
 
+
 def secret_to_string(key):
     sha256 = hashlib.sha256()
     sha256.update(SECRET_PREFIX)
@@ -79,6 +80,7 @@ def secret_to_string(key):
     result = SECRET_PREFIX + key + sum[:2]
 
     return base58.b58encode(result)
+
 
 def key_to_string(key):
     sha256 = hashlib.sha256()

@@ -1,0 +1,94 @@
+COMPUTER TIME s.r.l
+===================
+Progetto: Aron Web Manager
+Anno: Maggio 2015
+Tony P. <antonio@ctime.it>
+
+INSTALL STEP-BY-STEP
+====================
+
+- As Root Server:
+
+ 0- # Installazione Debian 8.1
+ 1- # aptitude install  squid3 \
+                        dansguardian \
+                        python-mysqldb \
+                        python-django \
+                        python-pip \
+                        exim4-daemon-heavy \
+                        dovecot-mysql \
+                        firehol \
+                        mysql-server \
+                        clamav-daemon \
+                        git \
+                        apache2 \
+                        libapache2-mod-wsgi \
+                        isc-dhcp-server \
+                        libsodium-dev \
+                        sudo \
+                        hdparm \
+			            python-crypto \
+			            python-bcrypt
+
+ 2- # pip install singlemodeladmin
+ 3- # pip install django-sizefield
+ 4- # pip install libnacl
+ 5- # pip install base58
+ 6- # cd /usr/local/src/
+ 7- # git clone https://github.com/darklow/django-suit
+ 8- # cd django-suit
+ 9- # python setup.py install
+10- # touch /etc/squid3/mac_allow /etc/squid3/classes_allow
+11- # chmod 666 /etc/squid3/squid.conf
+12- # chmod 666 /etc/firehol/mac_allow
+14- # chmod 666 /etc/network/interfaces
+15- # chmod 666 /var/log/squid3/cache.log
+16- # chmod 666 /etc/dhcp/dhcpd.conf
+17- # echo "www-data ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+
+- Cloning product
+
+$ cd /usr/local/src
+$ git clone http://aron.ctimeapps.it/tony/aron-web.git
+$ cd aron-web
+
+- Enter into MySQL Server with the administrator pass setup into install packages
+
+1- $ mysql -u root -h localhost -p
+2- mysql> create database aron;
+3- mysql> grant all privileges on aron.* to 'aron'@'localhost' identified by 'Password0fFantasy';
+4- mysql> flush privileges;
+5- mysql> exit;
+6- $ mysql -u root -h localhost -p aron < schema/init.sql
+
+
+- Edit settings.py in order to set user / pass / database / files / uid / gid settings.
+
+# vim web/settings.py
+
+
+- Aron Manager
+
+# python manage.py migrate
+# python manage.py loaddata schema/data.json
+
+- VirtualHost
+
+# vim /etc/apache2/site-available/aron.conf
+
+<VirtualHost *:80>
+    ServerName debian.ctimeapps.it
+    ServerAlias *.ctimeapps.it
+    WSGIScriptAlias / /usr/local/src/aron-web/web/wsgi.py
+    Alias /static/ /usr/local/src/aron-web/static/
+    <Directory />
+        Require all granted
+    </Directory>
+    <Location "/static/">
+        Options -Indexes
+    </Location>
+</VirtualHost>
+
+# a2ensite aron.conf
+# /etc/init.d/apache2 restart
