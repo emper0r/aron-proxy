@@ -20,6 +20,7 @@ class DeviceWANForm(forms.ModelForm):
         widgets = {
             'eth_ip_wan': forms.Select(),
         }
+        fields = '__all__'
 
 
 class DeviceLANForm(forms.ModelForm):
@@ -28,6 +29,7 @@ class DeviceLANForm(forms.ModelForm):
         widgets = {
             'eth_ip_lan': forms.Select(),
         }
+        fields = '__all__'
 
 
 class ManagementAdmin(SingleModelAdmin):
