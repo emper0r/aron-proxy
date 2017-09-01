@@ -5,10 +5,10 @@ ALLOWED_HOSTS = ['*']
 DEBUG = False
 DEFAULT_FROM_EMAIL = 'no-reply@domain.tld'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = ''
+EMAIL_HOST = 'HOSTMAIL'
 EMAIL_PORT = 25
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = 'EMAILUSER'
+EMAIL_HOST_PASSWORD = 'EPASSWORD'
 DHCP_CONF = '/etc/dhcp/dhcpd.conf'
 LANGUAGE_CODE = 'it-it'
 NETWORK_CONF = '/etc/network/interfaces'
@@ -48,7 +48,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'aron',
         'USER': 'aron',
-        'PASSWORD': '',
+        'PASSWORD': 'ARONPWD',
         'HOST': 'localhost',
         'PORT': '3306',
     }
