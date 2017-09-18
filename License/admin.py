@@ -174,7 +174,7 @@ class LicAdmin(SingleModelAdmin):
                 hd = subprocess.Popen('sudo hdparm -i /dev/sda', shell=True, stdout=subprocess.PIPE)
                 for line in hd.stdout:
                     uniq_id.write(line)
-                ethernet = subprocess.Popen('sudo ifconfig | egrep -i HWaddr | awk \'{print $5}\'', shell=True, stdout=subprocess.PIPE)
+                ethernet = subprocess.Popen('sudo ifconfig | egrep -i ether | awk \'{print $2}\'', shell=True, stdout=subprocess.PIPE)
                 for line in ethernet.stdout:
                     uniq_id.write(line)
                 uniq_id.close()
