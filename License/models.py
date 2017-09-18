@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from django.db import models
 import datetime
-import bf
+from . import bf
 
 
 class License(models.Model):

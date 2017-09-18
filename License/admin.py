@@ -42,7 +42,7 @@ def cl():
             hd = subprocess.Popen('sudo hdparm -i /dev/sda', shell=True, stdout=subprocess.PIPE)
             for line in hd.stdout:
                 uniq_id.write(line)
-            ethernet = subprocess.Popen('sudo ifconfig | egrep -i HWaddr | awk \'{print $5}\'', shell=True, stdout=subprocess.PIPE)
+            ethernet = subprocess.Popen('sudo ifconfig | egrep -i ether | awk \'{print $2}\'', shell=True, stdout=subprocess.PIPE)
             for line in ethernet.stdout:
                 uniq_id.write(line)
             uniq_id.close()
@@ -182,7 +182,7 @@ class LicAdmin(SingleModelAdmin):
                     data = file_to_check.read()
                     server_id = hashlib.md5(data).hexdigest()
                 os.system('rm -f %s' % uniq_file)
-                response = urllib2.urlopen(settings.SERVER_LIC + 'rl/' + obj.req + '/' + obj.lic + '/' +
+                response = urllib2.urlopen(settings.SERVER_LIC + '/rl/' + obj.req + '/' + obj.lic + '/' +
                                            bf.crypt(settings.DATABASES.values()[0]['PASSWORD']) + '/' +
                                            server_id, timeout=10)
                 server_lic = response.read()
