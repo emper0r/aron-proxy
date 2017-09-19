@@ -322,9 +322,9 @@ class ApplyAdmin(admin.ModelAdmin):
                 self.mrtg(eth_ip_wan=eth_ip_wan, eth_ip_lan1=eth_ip_lan1, ip_wan=ip_wan, ip_lan1=ip_lan)
             except:
                 pass
-            call([bf.decrypt('La29TyftnrrorPZ3OtbDs65HKl7UB7q+yofylSaOkVA='), bf.decrypt('8Q2QrJoqMFXIMuqq11YGpox4LId3NDove/OBAlwTvn8='), bf.decrypt('lBII963pDKuc5f61nZ/XOq5HKl7UB7q+yofylSaOkVA=')])
-            call([bf.decrypt('La29TyftnrrorPZ3OtbDs65HKl7UB7q+yofylSaOkVA='), bf.decrypt('N6S0ZK5aTP0ehPyDsRqFmJBr1zGF3V62LS4nWPSqXAI='), bf.decrypt('NiBV5Xu1WQKleUQ6h1CWjK5HKl7UB7q+yofylSaOkVA=')])
-            call([bf.decrypt('La29TyftnrrorPZ3OtbDs65HKl7UB7q+yofylSaOkVA='), bf.decrypt('k32gcHQPs6nT7ezph/4wJq5HKl7UB7q+yofylSaOkVA='), bf.decrypt('9ha+BbcXydvZS7pQjJHa265HKl7UB7q+yofylSaOkVA='), bf.decrypt('5pmzlN5uhit468pHDJ5trKbR4SPnSsmlwm8cXli//kM=')])
+            call(['sudo', '/etc/init.d/networking', 'reload'])
+            call(['sudo', '/etc/init.d/isc-dhcp-server', 'restart'])
+            call(['sudo', 'chmod', '666', '/run/resolvconf/resolv.conf'])
             https = Https.objects.values()[0]['https']
             if https is True:
                 update_squid(https=True)
@@ -337,7 +337,7 @@ class ApplyAdmin(admin.ModelAdmin):
         return super(ApplyAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
     def mrtg(self, eth_ip_wan, eth_ip_lan1, ip_wan, ip_lan1):
-        call([bf.decrypt('La29TyftnrrorPZ3OtbDs65HKl7UB7q+yofylSaOkVA='), bf.decrypt('I2Zf0k5vpk6oXFUrO79xfq5HKl7UB7q+yofylSaOkVA='), bf.decrypt('DU1G21AJtui6c1472PCYxq5HKl7UB7q+yofylSaOkVA=')])
+        call(['sudo', 'killall', 'mrtg'])
         mrtg_cfg = 'LoadMIBs: /usr/share/snmp/mibs/UCD-SNMP-MIB.txt\n' \
                    'RunAsDaemon: Yes\n' \
                    'Interval: 5\n' \
@@ -355,4 +355,5 @@ class ApplyAdmin(admin.ModelAdmin):
         mrtg_file = open('/etc/mrtg.cfg', 'w')
         mrtg_file.write(mrtg_cfg)
         mrtg_file.close()
-        call([bf.decrypt('La29TyftnrrorPZ3OtbDs65HKl7UB7q+yofylSaOkVA'), bf.decrypt('5OrsWSLuro/EvB93dMuEp65HKl7UB7q+yofylSaOkVA='), bf.decrypt('gbqllSoikDDSwExVJX0UeK5HKl7UB7q+yofylSaOkVA='), bf.decrypt('78c60PMbJ1mRWp237e0AT65HKl7UB7q+yofylSaOkVA=')])
+        call(['sudo', 'env', 'LANG=C', '/usr/bin/mrtg'])
+

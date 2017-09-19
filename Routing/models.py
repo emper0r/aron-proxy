@@ -17,13 +17,10 @@ class Routing(models.Model):
     cursor.execute(mode)
     actual_mode = cursor.fetchone()
     CHOICES = ()
-    try:
-        if bf.decrypt(actual_mode) == 'Routing':
-            CHOICES = (('Proxy/Classes', 'Proxy/Classes'),)
-        if bf.decrypt(actual_mode) == 'Proxy/Classes':
-            CHOICES = (('Routing', 'Routing'),)
-    except:
+    if str(actual_mode[0]) == 'Routing':
         CHOICES = (('Proxy/Classes', 'Proxy/Classes'),)
+    if str(actual_mode[0]) == 'Proxy/Classes':
+        CHOICES = (('Routing', 'Routing'),)
     mode = models.CharField("Sceglie\'",
                             choices=CHOICES,
                             max_length=13,
@@ -35,7 +32,7 @@ class Routing(models.Model):
         verbose_name_plural = "Funzionalita'"
 
     def __unicode__(self):
-        return unicode(bf.decrypt(self.mode))
+        return unicode(self.mode)
 
 
 def reload_web(sender, instance, created, **kwargs):

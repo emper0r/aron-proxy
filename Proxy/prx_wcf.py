@@ -6,6 +6,7 @@ from Routing.models import Routing
 
 
 def update_squid(https=False):
+    os.system("sudo chmod 666 /etc/squid/squid.conf")
     proxy_conf = open(settings.SQUID_CONF, 'w')
     squid_conf = '''http_port 127.0.0.1:8080
 http_port 3128 intercept
@@ -135,9 +136,9 @@ cache_effective_group proxy\n'''
         squid_conf = 'acl bl_domain dstdomain "/etc/squid/black_domain"\n'
         squid_conf += 'http_access deny bl_domain\n'
         proxy_conf.write(squid_conf)
-    if not bf.decrypt(str(Routing.objects.values()[0]['mode'])) == 'Routing':
+    if not str(Routing.objects.values()[0]['mode']) == 'Routing':
         squid_conf = "http_access allow localnet"
-    if not bf.decrypt(str(Routing.objects.values()[0]['mode'])) == 'Proxy/Classes':
+    if not str(Routing.objects.values()[0]['mode']) == 'Proxy/Classes':
         squid_conf = "http_access allow mac_allows"
     proxy_conf.write(squid_conf)
     squid_conf = '''

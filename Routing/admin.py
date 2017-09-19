@@ -44,8 +44,6 @@ class RoutingAdmin(SingleModelAdmin):
                 admin.site.unregister(NewDevices)
                 admin.site.unregister(Https)
                 admin.site.unregister(Blacklist)
-                admin.site.unregister(User)
-                admin.site.unregister(Group)
                 fw = open(settings.FIREHOL_DIR + 'firehol.conf', 'w')
                 fw_conf = 'version 6\n' \
                           'LAN="10.0.0.0/8 172.16.0.0/16 192.168.0.0/16"\n\n' \
@@ -73,8 +71,6 @@ class RoutingAdmin(SingleModelAdmin):
                 os.system("sudo firehol restart")
 
             if mode == 'Proxy/Classes':
-                admin.site.register(User)
-                admin.site.register(Group)
                 admin.site.register(Classi, ClassiAdmin)
                 admin.site.register(MAC, MACAdmin)
                 admin.site.register(Professori, ProfessoriAdmin)
@@ -116,11 +112,11 @@ class RoutingAdmin(SingleModelAdmin):
                 fw.close()
                 os.system("sudo firehol restart")
                 update_squid(https=False)
-            obj.mode = bf.crypt(mode)
+            obj.mode = mode
             super(RoutingAdmin, self).save_model(request, obj, form, change)
             messages.set_level(request, messages.SUCCESS)
         else:
             mode = Routing.objects.values()[0]['mode']
-            obj.mode = bf.crypt(mode)
+            obj.mode = mode
             messages.set_level(request, messages.ERROR)
             messages.error(request, "Devi inserire un MAC valido in Network / MAC Management prima di cambiare il modo.")

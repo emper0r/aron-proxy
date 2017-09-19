@@ -53,7 +53,7 @@ def cl():
             try:
                 response = urllib2.urlopen(settings.SERVER_LIC + '/cl/' + server_id, timeout=10)
                 server_lic = response.read()
-                if server_lic[0] is '0':
+                if int(str(server_lic)[0]) is 0:
                     return
                 else:
                     wan = WAN.objects.all().values()[0]['eth_ip_wan']
@@ -155,8 +155,8 @@ def submit_row(context):
 class LicAdmin(SingleModelAdmin):
     k = License.objects.all().count()
     if k > 0:
-        readonly_fields = ('client', 'name', 'province', 'masq_qty_dev', 'masq_req', 'masq_lic', 'masq_date')
-        exclude = ('req', 'lic', 'exp_lic', 'qty_dev')
+        readonly_fields = ('client', 'name', 'masq_qty_dev', 'masq_req', 'masq_lic', 'masq_date')
+        exclude = ('req', 'lic', 'exp_lic', 'province', 'qty_dev')
     else:
         list_display = ('req', 'lic')
         exclude = ('client', 'name', 'province', 'qty_dev', 'masq_qty_dev', 'masq_req', 'masq_lic', 'exp_lic')
@@ -165,7 +165,6 @@ class LicAdmin(SingleModelAdmin):
         k = License.objects.all().count()
         if k is 0:
             try:
-                assert key.validate(obj.req, obj.lic) is 0
                 uniq_file = '/tmp/._'
                 uniq_id = open(uniq_file, 'w')
                 hardware = subprocess.Popen('sudo lspci', shell=True, stdout=subprocess.PIPE)
@@ -186,13 +185,11 @@ class LicAdmin(SingleModelAdmin):
                                            bf.crypt(settings.DATABASES.values()[0]['PASSWORD']) + '/' +
                                            server_id, timeout=10)
                 server_lic = response.read()
-                if server_lic[0] is '0':
+                if int(str(server_lic)[0]) is 0:
                     obj.client = map(str.strip, server_lic.split(','))[1]
                     obj.name = map(str.strip, server_lic.split(','))[2]
-                    obj.province = map(str.strip, server_lic.split(','))[3]
-                    obj.exp_lic = bf.crypt(map(str.strip, server_lic.split(','))[4][:10])
-                    obj.qty_dev = bf.crypt(map(str.strip, server_lic.split(','))[5])
-                    key.validate(obj.req, obj.lic)
+                    obj.exp_lic = bf.crypt(map(str.strip, server_lic.split(','))[3][:10])
+                    obj.qty_dev = bf.crypt(map(str.strip, server_lic.split(','))[4])
                     obj.req = bf.crypt(obj.req)
                     obj.lic = bf.crypt(obj.lic)
                     messages.set_level(request, messages.SUCCESS)
@@ -213,17 +210,12 @@ class LicAdmin(SingleModelAdmin):
                         file_save.close()
                         os.unlink(tmp_sql)
                         os.system("sudo mv /tmp/config.aron.factory.prx %s/" % settings.STATICFILES_DIRS)
-                    call([bf.decrypt('0jjuAvcHYRkzQuSvZVYb7opgRMPsKmw2w6pxUdNF1pJSsJ3Bgpfc4/+zKoNvo7i5rkcqXtQHur7Kh/KVJo6RUA==')])
-                    call([bf.decrypt('La29TyftnrrorPZ3OtbDs65HKl7UB7q+yofylSaOkVA='), bf.decrypt('zhNmW8SlAdZHfnlhxFzcza5HKl7UB7q+yofylSaOkVA='), bf.decrypt('myg+PjNKgka7LrTD6vyHHa5HKl7UB7q+yofylSaOkVA='), bf.decrypt('cyhXvxc7gSmhF2HEhb/Au65HKl7UB7q+yofylSaOkVA=')])
                     time.sleep(2)
-                    call([bf.decrypt('il4+OUznnFh9B5/7TyJdSa5HKl7UB7q+yofylSaOkVA='), bf.decrypt('QXh+o1OO7R4MRz8m7KZXUq5HKl7UB7q+yofylSaOkVA='), bf.decrypt('22V2vVtVeGiEZ5YtTVz7ffhdOO5jCiI/dSz3IFEq0k4=')])
-                    call([bf.decrypt('XIEOTe3jI7K5DxWSUoXZya5HKl7UB7q+yofylSaOkVA='), bf.decrypt('22V2vVtVeGiEZ5YtTVz7ffhdOO5jCiI/dSz3IFEq0k4=')])
-                    call([bf.decrypt('k32gcHQPs6nT7ezph/4wJq5HKl7UB7q+yofylSaOkVA='), bf.decrypt('9ha+BbcXydvZS7pQjJHa265HKl7UB7q+yofylSaOkVA='), bf.decrypt('22V2vVtVeGiEZ5YtTVz7ffhdOO5jCiI/dSz3IFEq0k4=')])
                     return
-                if server_lic[0] is '1':
+                if int(str(server_lic)[0]) is 1:
                     messages.set_level(request, messages.ERROR)
                     messages.error(request, "Questa licenza non e' valida, e' necessario richiedere una nuova a Computer Time s.r.l")
-                if server_lic[0] is '2':
+                if int(str(server_lic)[0]) is 2:
                     messages.set_level(request, messages.ERROR)
                     messages.error(request, "E' gia' stata attivata questa licenza, e' necessario richiedere una nuova a Computer Time s.r.l")
             except:
@@ -251,42 +243,52 @@ class LicAdmin(SingleModelAdmin):
         extra_context['show_delete_link'] = False
         return super(LicAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
-if License.objects.all().count() is 0:
-    admin.site.unregister(User)
-    admin.site.unregister(Group)
-
 admin.site.register(License, LicAdmin)
 admin.site.register(WAN, WANAdmin)
 admin.site.register(LAN, LANAdmin)
 admin.site.register(Management, ManagementAdmin)
 admin.site.register(Apply, ApplyAdmin)
 admin.site.register(dhcptable, dhcptableAdmin)
+admin.site.register(Routing, RoutingAdmin)
+admin.site.register(ImportConfig, ImportConfigAdmin)
+admin.site.register(ExportConfig, ExportConfigAdmin)
+admin.site.register(DashBoard, DashBoardAdmin)
+admin.site.register(Aiuto, AiutoAdmin)
+admin.site.register(LFD, LFDAdmin)
+admin.site.register(Top, TopAdmin)
+admin.site.register(AronLogs, AronLogsAdmin)
+
+
+if License.objects.all().count() is 0:
+    admin.site.unregister(User)
+    admin.site.unregister(Group)
+    admin.site.unregister(Routing)
+    admin.site.unregister(ImportConfig)
+    admin.site.unregister(ExportConfig)
+    admin.site.unregister(DashBoard)
+    admin.site.unregister(Aiuto)
+    admin.site.unregister(LFD)
+    admin.site.unregister(Top)
+    admin.site.unregister(AronLogs)
 
 if License.objects.all().count() > 0:
+    obj = License.objects.get()
     try:
-        obj = License.objects.get()
-        assert key.validate(bf.decrypt(obj.req), bf.decrypt(obj.lic)) is 0
-        admin.site.register(Routing, RoutingAdmin)
-        admin.site.register(ImportConfig, ImportConfigAdmin)
-        admin.site.register(ExportConfig, ExportConfigAdmin)
-        admin.site.register(DashBoard, DashBoardAdmin)
-        admin.site.register(AronLogs, AronLogsAdmin)
-        admin.site.register(Top, TopAdmin)
-        admin.site.register(Cache, CacheAdmin)
-        admin.site.register(Aiuto, AiutoAdmin)
-        admin.site.register(LFD, LFDAdmin)
-        if bf.decrypt(str(Routing.objects.values()[0]['mode'])) == 'Routing':
+        if str(Routing.objects.values()[0]['mode']) == 'Routing':
             admin.site.unregister(Classi)
             admin.site.unregister(MAC)
             admin.site.unregister(Professori)
             admin.site.unregister(NewDevices)
+            admin.site.unregister(Cache)
+            admin.site.unregister(Https)
+            admin.site.unregister(Blacklist)
         else:
             admin.site.register(Classi, ClassiAdmin)
             admin.site.register(MAC, MACAdmin)
             admin.site.register(Professori, ProfessoriAdmin)
+            admin.site.register(Cache, CacheAdmin)
             admin.site.register(NewDevices, NewDevicesAdmin)
             admin.site.register(Blacklist, BlacklistAdmin)
             admin.site.register(Https, HttpsAdmin)
     except:
-        admin.site.unregister(User)
-        admin.site.unregister(Group)
+        pass
